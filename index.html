@@ -44,6 +44,11 @@ h1.mega .lime{color:var(--lime)}
 .chip.pt.on{background:var(--agua);border-color:var(--agua);color:#0c0e0f}
 .chip.add{border-style:dashed;color:var(--muted)}
 .countBadge{background:var(--lime);color:#0c0e0f;border-radius:999px;padding:5px 14px;font-family:Oswald;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+.editBtn{border:1px solid var(--line2);background:transparent;color:var(--muted);border-radius:999px;padding:5px 13px;font-family:Oswald;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+.editBtn.on{border-color:var(--coral);color:var(--coral)}
+.chip .mini{margin-left:9px;font-size:12px;font-weight:800;cursor:pointer}
+.chip .mini.del{color:var(--coral)}
+.chip .mini.pin{color:var(--agua)}
 /* inventory */
 .invGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px}
 .invBox{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:16px}
@@ -175,7 +180,10 @@ h1.mega .lime{color:var(--lime)}
     <div class="card">
       <div class="secRow">
         <div><p class="sec">01 · El equipo de hoy</p></div>
-        <span class="countBadge" id="pCount">0 personas</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="countBadge" id="pCount">0 personas</span>
+          <button class="editBtn" id="editNames">✎ editar</button>
+        </div>
       </div>
       <div class="groupLab">Fijos</div>
       <div class="chips" id="fixedChips"></div>
@@ -307,7 +315,7 @@ h1.mega .lime{color:var(--lime)}
     {name:"Pack 12 kg",tag:"Original",kg:12},
     {name:"Pack 15 kg",tag:"Mini",kg:15},
   ];
-  const FIXED=["Kevin","Wilfredo","Nicol","José","Operario 5","Operario 6","Santiago","Nocturno 2","Nocturno 3"];
+  const FIXED_BASE=["Kevin","Wilfredo","Nicol","José","Santiago"];
   const PT_BASE=["Breiner","Marlon"];
   const $=id=>document.getElementById(id);
   const fmt=n=>new Intl.NumberFormat('es-CL').format(Math.round(n));
@@ -323,8 +331,12 @@ h1.mega .lime{color:var(--lime)}
   // ------- estado -------
   let S=null;
   try{S=JSON.parse(localStorage.getItem('turnoState')||'null')}catch(e){}
+  let fixedNames=FIXED_BASE.slice();
+  try{const f=JSON.parse(localStorage.getItem('fixedNames')||'null'); if(Array.isArray(f)) fixedNames=f;}catch(e){}
   let ptNames=PT_BASE.slice();
-  try{const n=JSON.parse(localStorage.getItem('ptNames')||'null'); if(Array.isArray(n)&&n.length) ptNames=[...new Set([...PT_BASE,...n])];}catch(e){}
+  try{const n=JSON.parse(localStorage.getItem('ptNames')||'null'); if(Array.isArray(n)) ptNames=n;}catch(e){}
+  let editMode=false;
+  function persistNames(){localStorage.setItem('fixedNames',JSON.stringify(fixedNames));localStorage.setItem('ptNames',JSON.stringify(ptNames))}
   let history=[];
   try{const h=JSON.parse(localStorage.getItem('turnoHistory')||'null'); if(Array.isArray(h)) history=h;}catch(e){}
   let selected=new Set();
@@ -384,35 +396,51 @@ h1.mega .lime{color:var(--lime)}
   [0,1,2].forEach(i=>$('inv'+i).addEventListener('input',updInv));
 
   // ------- setup screen -------
+  function chipEl(n,isPt){
+    const c=document.createElement('div');
+    c.className='chip'+(isPt?' pt':'')+(!editMode&&selected.has(n)?' on':'');
+    c.appendChild(document.createTextNode(n));
+    if(editMode){
+      if(isPt){
+        const pin=document.createElement('span');pin.className='mini pin';pin.textContent='📌 fijar';
+        pin.onclick=e=>{e.stopPropagation();ptNames=ptNames.filter(x=>x!==n);if(!fixedNames.includes(n))fixedNames.push(n);persistNames();renderChips()};
+        c.appendChild(pin);
+      }
+      const del=document.createElement('span');del.className='mini del';del.textContent='✕';
+      del.onclick=e=>{e.stopPropagation();
+        if(!confirm('¿Eliminar a '+n+' de la lista?'))return;
+        fixedNames=fixedNames.filter(x=>x!==n);ptNames=ptNames.filter(x=>x!==n);
+        selected.delete(n);persistNames();renderChips()};
+      c.appendChild(del);
+    }else{
+      c.onclick=()=>{selected.has(n)?selected.delete(n):selected.add(n);renderChips()};
+    }
+    return c;
+  }
   function renderChips(){
     const fx=$('fixedChips');fx.innerHTML='';
-    FIXED.forEach(n=>{
-      const c=document.createElement('div');
-      c.className='chip'+(selected.has(n)?' on':'');c.textContent=n;
-      c.onclick=()=>{selected.has(n)?selected.delete(n):selected.add(n);renderChips()};
-      fx.appendChild(c);
-    });
+    fixedNames.forEach(n=>fx.appendChild(chipEl(n,false)));
     const pt=$('ptChips');pt.innerHTML='';
-    ptNames.forEach(n=>{
-      const c=document.createElement('div');
-      c.className='chip pt'+(selected.has(n)?' on':'');c.textContent=n;
-      c.onclick=()=>{selected.has(n)?selected.delete(n):selected.add(n);renderChips()};
-      pt.appendChild(c);
-    });
+    ptNames.forEach(n=>pt.appendChild(chipEl(n,true)));
     const add=document.createElement('div');
     add.className='chip add';add.textContent='＋ agregar operario';
     add.onclick=()=>{
       const n=prompt('Nombre del nuevo operario:');
       if(n&&n.trim()){
         const nn=n.trim();
-        if(!ptNames.includes(nn)&&!FIXED.includes(nn)){ptNames.push(nn);localStorage.setItem('ptNames',JSON.stringify(ptNames))}
-        selected.add(nn);renderChips();
+        if(!ptNames.includes(nn)&&!fixedNames.includes(nn)){ptNames.push(nn);persistNames()}
+        if(!editMode)selected.add(nn);
+        renderChips();
       }
     };
     pt.appendChild(add);
+    const eb=$('editNames');
+    eb.textContent=editMode?'✓ listo':'✎ editar';
+    eb.className='editBtn'+(editMode?' on':'');
     $('pCount').textContent=selected.size+(selected.size===1?' persona':' personas');
-    $('startBtn').disabled=selected.size===0;
+    $('startBtn').disabled=selected.size===0||editMode;
   }
+  $('editNames').onclick=()=>{editMode=!editMode;renderChips()};
   function renderSetupWarn(){
     const b=belowThisMonth(), w=$('setupWarn');
     if(b>0){
