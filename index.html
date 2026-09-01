@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Camino al Bono — THE ICE</title>
@@ -15,12 +15,15 @@
   --line:#262c2d; --line2:#2b3132;
   --text:#f1f4f2; --muted:#7e8a85; --muted2:#8b9691;
   --lime:#c9f24e; --limeHi:#dcff7a; --limePress:#b2db3c; --limeDim:#4a6b1f;
-  --celeste:#4ec9f2; --agua:#63e0c0; --amarillo:#ffd23f; --naranja:#ff9f1c; --rojo:#ff5c38; --coral:#ff7a5c;
+  --celeste:#4ec9f2; --agua:#63e0c0; --amarillo:#ffd23f; --naranja:#ff9f1c;
+  --rojo:#ff5c38; --coral:#ff7a5c;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+input{user-select:text}
+button:focus-visible,input:focus-visible{outline:3px solid var(--celeste);outline-offset:3px}
+button{touch-action:manipulation}
 body{margin:0;background:var(--bg);color:var(--text);font-family:Archivo,system-ui,sans-serif;min-height:100vh}
 .wrap{max-width:980px;margin:auto;padding:22px 20px 44px}
-/* ---- header ---- */
 .brandRow{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px}
 .brand{display:flex;align-items:center;gap:10px}
 .brand .ti{width:34px;height:34px;border-radius:10px;background:var(--lime);color:#0c0e0f;display:flex;align-items:center;justify-content:center;font-family:Oswald;font-weight:700;font-size:15px}
@@ -29,27 +32,28 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:Archivo,system-
 h1.mega{font-family:Oswald;font-weight:700;font-size:60px;line-height:.95;margin:0;letter-spacing:.01em;text-transform:uppercase}
 h1.mega .lime{color:var(--lime)}
 .lede{color:var(--muted2);font-size:15px;margin:14px 0 26px;max-width:360px;line-height:1.5}
-/* ---- cards ---- */
 .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:16px}
 .sec{font-family:Oswald;font-size:13px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--lime);margin:0 0 4px}
 .secSub{font-size:13px;color:var(--muted);margin:0 0 8px}
 .secRow{display:flex;justify-content:space-between;align-items:flex-start}
 .groupLab{font-family:Oswald;font-size:10px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);margin:16px 0 2px}
 .groupLab:first-of-type{margin-top:10px}
-/* chips */
+.groupHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px}
+.groupHead .groupLab{margin:0}
+.addPerson{display:none;border:1px dashed var(--line2);background:transparent;color:var(--agua);border-radius:999px;padding:8px 12px;font:600 11px Oswald;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+#rosterCard.editing .addPerson{display:block}
 .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
 .chip{border:1px solid var(--line2);background:transparent;color:var(--text);border-radius:999px;padding:13px 22px;font-size:15px;font-weight:600;cursor:pointer;transition:.15s}
 .chip.on{background:var(--lime);border-color:var(--lime);color:#0c0e0f}
-.chip.pt{border-style:solid;border-color:#3a4142;color:var(--muted2)}
+.chip.pt{border-color:#3a4142;color:var(--muted2)}
 .chip.pt.on{background:var(--agua);border-color:var(--agua);color:#0c0e0f}
 .chip.add{border-style:dashed;color:var(--muted)}
 .countBadge{background:var(--lime);color:#0c0e0f;border-radius:999px;padding:5px 14px;font-family:Oswald;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
 .editBtn{border:1px solid var(--line2);background:transparent;color:var(--muted);border-radius:999px;padding:5px 13px;font-family:Oswald;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+.editBtn,.addPerson,.endBtn,.deleteDay{min-height:44px}
 .editBtn.on{border-color:var(--coral);color:var(--coral)}
-.chip .mini{margin-left:9px;font-size:12px;font-weight:800;cursor:pointer}
+.chip .mini{margin-left:9px;font-size:12px;font-weight:800;cursor:pointer;background:transparent;border:0;padding:4px;color:inherit}
 .chip .mini.del{color:var(--coral)}
-.chip .mini.pin{color:var(--agua)}
-/* inventory */
 .invGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px}
 .invBox{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:16px}
 .invBox h4{margin:0;font-family:Oswald;font-weight:600;font-size:15px;letter-spacing:.06em;text-transform:uppercase}
@@ -61,13 +65,11 @@ h1.mega .lime{color:var(--lime)}
 .totalInv .lab{font-family:Oswald;font-size:11px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
 .totalInv b{font-family:Oswald;font-size:22px;color:var(--lime)}
 .totalInv span{font-size:12px;color:var(--muted)}
-/* buttons */
 .startBtn{width:100%;border:0;border-radius:16px;padding:20px;font-family:Oswald;font-size:17px;font-weight:600;letter-spacing:.28em;text-transform:uppercase;cursor:pointer;background:var(--lime);color:#0c0e0f;margin-top:8px;transition:.15s}
 .startBtn:active{background:var(--limePress)}
 .startBtn:disabled{background:var(--limeDim);color:#182009;opacity:.9}
 .ghostBtn{width:100%;border:1px solid var(--line2);background:transparent;color:var(--muted2);border-radius:14px;padding:14px;font-family:Oswald;font-size:13px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;margin-top:12px}
 .warnLine{margin-top:14px;border:1px solid #5c2a1e;background:linear-gradient(135deg,#241614,#15191a);border-radius:14px;padding:13px 16px;font-size:13px;color:var(--coral);font-weight:600;display:none}
-/* ---- main ---- */
 .topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}
 .clock small{font-family:Oswald;font-size:11px;display:block;color:var(--lime);font-weight:600;letter-spacing:.28em;text-transform:uppercase;margin-bottom:2px}
 .clock span{font-family:Oswald;font-size:38px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:.04em}
@@ -79,7 +81,6 @@ h1.mega .lime{color:var(--lime)}
 .metaBox b{font-family:Oswald;font-size:24px;font-weight:600}
 .metaBox.hl b{color:var(--lime)}
 .metaBox.kg b{color:var(--agua)}
-/* counters */
 .prodGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .prod{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:16px;text-align:center}
 .prod h4{margin:0;font-family:Oswald;font-weight:600;font-size:15px;letter-spacing:.06em;text-transform:uppercase}
@@ -87,31 +88,29 @@ h1.mega .lime{color:var(--lime)}
 .prod .invNow b{color:var(--lime)}
 .prod .kgProd{font-family:Oswald;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--agua);margin-bottom:6px}
 .prod .n{font-family:Oswald;font-size:52px;font-weight:600;line-height:1;margin:4px 0 14px;font-variant-numeric:tabular-nums}
+.countInput{display:block;width:100%;background:var(--input);border:1px solid var(--line2);border-radius:14px;color:var(--text);text-align:center;padding:10px 8px;appearance:textfield}
+.countInput::-webkit-inner-spin-button,.countInput::-webkit-outer-spin-button{appearance:none;margin:0}
 .bRow{display:flex;gap:10px}
 .bRow button{flex:1;border:0;border-radius:14px;font-family:Oswald;font-size:24px;font-weight:600;padding:17px 0;cursor:pointer;transition:.1s}
 .plus{background:var(--lime);color:#0c0e0f}
 .plus:active{background:var(--limePress);transform:scale(.97)}
-.minus{background:var(--input);border:1px solid var(--line2) !important;color:var(--muted)}
-/* big total */
+.minus{background:var(--input);border:1px solid var(--line2)!important;color:var(--muted)}
 .totalRow{display:flex;align-items:baseline;justify-content:center;gap:16px;margin:20px 0 0;flex-wrap:wrap}
 .totalRow .lab{font-family:Oswald;font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
 .totalRow .big{font-family:Oswald;font-size:76px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;color:var(--lime);transition:color .4s}
 .totalRow .kgs{color:var(--muted);font-size:14px;font-weight:600}
 .kgBig{text-align:center;font-family:Oswald;font-size:16px;font-weight:600;letter-spacing:.08em;color:var(--agua);margin:4px 0 0;text-transform:uppercase}
-/* progress */
 .barWrap{position:relative;margin:28px 6px 40px}
 .bar{height:22px;background:var(--input);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
 .fill{height:100%;border-radius:999px;width:0%;transition:width .4s ease;background:var(--celeste)}
 .mark{position:absolute;top:-7px;bottom:-7px;width:3px;background:var(--line2);border-radius:2px;transition:background .3s}
 .markLab{position:absolute;top:30px;transform:translateX(-50%);font-family:Oswald;font-size:10px;font-weight:600;letter-spacing:.1em;color:var(--muted);white-space:nowrap;text-align:center;text-transform:uppercase}
 .markLab b{display:block;font-size:12px;color:var(--muted2)}
-/* message */
 .msg{border-radius:20px;padding:22px;text-align:center;margin-bottom:16px;border:1px solid var(--line);background:var(--card);transition:border-color .3s}
 .msg .t1{font-family:Oswald;font-size:26px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;margin-bottom:6px}
 .msg .t2{font-size:14px;color:var(--muted2);line-height:1.5}
 .pulse{animation:pulse 1.6s infinite}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.015)}}
-/* stats */
 .statGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
 .stat span{display:block;font-family:Oswald;font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
@@ -120,7 +119,6 @@ h1.mega .lime{color:var(--lime)}
 .stat.money b{color:var(--lime)}
 .stat.month{grid-column:1/-1;background:linear-gradient(135deg,#16201a,#131718);border-color:#3d5a22}
 .stat.month b{color:var(--lime);font-size:32px}
-/* overlay */
 .overlay{position:fixed;inset:0;background:rgba(6,8,9,.94);display:none;align-items:center;justify-content:center;z-index:50;padding:20px;overflow:auto}
 .overlay.show{display:flex}
 .sumCard{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:30px;max-width:560px;width:100%;text-align:center;margin:auto}
@@ -131,7 +129,6 @@ h1.mega .lime{color:var(--lime)}
 .sumGrid div{background:var(--input);border:1px solid var(--line);border-radius:12px;padding:14px}
 .sumGrid span{display:block;font-family:Oswald;font-size:9px;color:var(--muted);font-weight:600;letter-spacing:.2em;text-transform:uppercase;margin-bottom:3px}
 .sumGrid b{font-family:Oswald;font-size:22px;font-weight:600}
-/* ---- reporte ---- */
 .repGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px}
 .rep{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
 .rep span{display:block;font-family:Oswald;font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
@@ -142,7 +139,8 @@ h1.mega .lime{color:var(--lime)}
 .rep.alert{grid-column:1/-1}
 .rep.alert.ok{border-color:#3d5a22}.rep.alert.ok b{color:var(--lime)}
 .rep.alert.warn{border-color:#7a5a12}.rep.alert.warn b{color:var(--amarillo)}
-.rep.alert.bad{border-color:#5c2a1e;background:linear-gradient(135deg,#241614,#15191a)}.rep.alert.bad b{color:var(--rojo)}
+.rep.alert.bad{border-color:#5c2a1e;background:linear-gradient(135deg,#241614,#15191a)}
+.rep.alert.bad b{color:var(--rojo)}
 .histList{margin-top:4px}
 .histRow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:13px 4px;border-bottom:1px solid var(--line)}
 .histRow:last-child{border-bottom:0}
@@ -151,9 +149,16 @@ h1.mega .lime{color:var(--lime)}
 .histRow .lvl{font-family:Oswald;font-size:11px;font-weight:600;border-radius:999px;padding:4px 10px;letter-spacing:.08em}
 .histRow .pz{font-family:Oswald;font-size:14px;font-weight:600;color:var(--lime);min-width:76px;text-align:right}
 .histRow.below .d{color:var(--coral)}
+.deleteDay{min-width:44px;min-height:44px;border:1px solid #5c2a1e;background:transparent;color:var(--coral);border-radius:12px;cursor:pointer;font-size:17px}
+.historyActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.dangerBtn{border-color:#5c2a1e;color:var(--coral);margin-top:0}
+.dangerBtn.strong{background:#241614}
 .disc{text-align:center;font-size:11px;color:#4d5a55;margin:18px 4px 0;line-height:1.5}
 .confetti{position:fixed;top:-20px;font-size:22px;z-index:99;pointer-events:none;animation:fall linear forwards}
 @keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.3}}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
 @media(max-width:640px){
   .invGrid,.prodGrid{grid-template-columns:1fr}
   .statGrid,.repGrid{grid-template-columns:1fr}
@@ -162,572 +167,933 @@ h1.mega .lime{color:var(--lime)}
   .totalRow .big{font-size:56px}
   .crewLab{display:none}
   .sumGrid{grid-template-columns:1fr 1fr}
+  .histRow{display:grid;grid-template-columns:1fr auto auto;align-items:center}
+  .histRow .v{grid-column:1/-1;grid-row:2}
+  .histRow .pz{grid-column:2;grid-row:1}
+  .histRow .deleteDay{grid-column:3;grid-row:1/3}
+  .historyActions{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <!-- ============ SETUP ============ -->
-  <div id="setup">
-    <div class="brandRow">
-      <div class="brand"><div class="ti">TI</div><span>THE ICE</span></div>
-      <div class="dateLab" id="dateLab"></div>
-    </div>
-    <h1 class="mega">Camino<br><span class="lime">al Bono</span></h1>
-    <p class="lede">Arma el turno, cuenta cada malla y mira crecer el pozo del día.</p>
-
-    <div class="card">
-      <div class="secRow">
-        <div><p class="sec">01 · El equipo de hoy</p></div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span class="countBadge" id="pCount">0 personas</span>
-          <button class="editBtn" id="editNames">✎ editar</button>
-        </div>
-      </div>
-      <div class="groupLab">Fijos</div>
-      <div class="chips" id="fixedChips"></div>
-      <div class="groupLab">Part-time</div>
-      <div class="chips" id="ptChips"></div>
-    </div>
-
-    <div class="card">
-      <p class="sec">02 · Inventario al iniciar</p>
-      <p class="secSub">Mallas en bodega por producto. Los kilos se calculan solos.</p>
-      <div class="invGrid">
-        <div class="invBox"><h4>Pack 15 kg</h4><div class="tag">Original · 15 kg por malla</div><input id="inv0" type="number" min="0" value="0" inputmode="numeric"><div class="kgLab"><b id="kg0">0</b>kg en bodega</div></div>
-        <div class="invBox"><h4>Pack 12 kg</h4><div class="tag">Original · 12 kg por malla</div><input id="inv1" type="number" min="0" value="0" inputmode="numeric"><div class="kgLab"><b id="kg1">0</b>kg en bodega</div></div>
-        <div class="invBox"><h4>Pack 15 kg</h4><div class="tag">Mini · 15 kg por malla</div><input id="inv2" type="number" min="0" value="0" inputmode="numeric"><div class="kgLab"><b id="kg2">0</b>kg en bodega</div></div>
-      </div>
-      <div class="totalInv"><span class="lab">Total inventario</span><b id="totInvM">0</b><span>mallas</span><b id="totInvK">0</b><span>kg</span></div>
-    </div>
-
-    <button class="startBtn" id="startBtn" disabled>Iniciar turno</button>
-    <button class="ghostBtn" id="repBtn">📊 Reportería del mes</button>
-    <div class="warnLine" id="setupWarn"></div>
+<div id="setup">
+  <div class="brandRow">
+    <div class="brand"><div class="ti">TI</div><span>THE ICE</span></div>
+    <div class="dateLab" id="dateLab"></div>
   </div>
 
-  <!-- ============ MAIN ============ -->
-  <div id="main" style="display:none">
-    <div class="topbar">
-      <div class="clock"><small>Turno en curso</small><span id="clock">00:00:00</span></div>
-      <div style="text-align:right">
-        <div class="crewLab" id="crew"></div>
-        <button class="endBtn" id="endBtn">Terminar</button>
+  <h1 class="mega">Camino<br><span class="lime">al Bono</span></h1>
+  <p class="lede">Arma el turno, cuenta cada malla y mira crecer el pozo del día.</p>
+
+  <div class="card" id="rosterCard">
+    <div class="secRow">
+      <p class="sec">01 · El equipo de hoy</p>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="countBadge" id="pCount" aria-live="polite">0 personas</span>
+        <button class="editBtn" id="editNames">Configurar</button>
       </div>
     </div>
 
-    <div class="metaStrip">
-      <div class="metaBox"><span>Bodega ahora</span><b id="invNowTotal">0</b></div>
-      <div class="metaBox kg"><span>Kilos de hoy</span><b id="kgToday">0</b></div>
-      <div class="metaBox hl"><span>Meta base</span><b id="metaBase">190</b></div>
-      <div class="metaBox"><span>Bono desde</span><b id="metaTrig">212</b></div>
+    <div class="groupHead">
+      <div class="groupLab">Turno AM</div>
+      <button class="addPerson" data-group="am">＋ Agregar</button>
     </div>
+    <div class="chips" id="amChips"></div>
 
-    <div class="card">
-      <p class="sec">Producción del turno</p>
-      <p class="secSub">Toca +1 por cada malla lista.</p>
-      <div class="prodGrid" id="prodGrid"></div>
-      <div class="totalRow"><span class="lab">Llevan</span><div class="big" id="totalBags">0</div><span class="kgs" id="totalKgLab"></span></div>
-      <div class="kgBig" id="kgBig">0 kg producidos</div>
-
-      <div class="barWrap">
-        <div class="bar"><div class="fill" id="fill"></div></div>
-        <div id="marks"></div>
-      </div>
+    <div class="groupHead">
+      <div class="groupLab">Turno extensión</div>
+      <button class="addPerson" data-group="extension">＋ Agregar</button>
     </div>
+    <div class="chips" id="extensionChips"></div>
 
-    <div class="msg" id="msg">
-      <div class="t1" id="msgT1"></div>
-      <div class="t2" id="msgT2"></div>
+    <div class="groupHead">
+      <div class="groupLab">Turno PM</div>
+      <button class="addPerson" data-group="pm">＋ Agregar</button>
     </div>
-
-    <div class="statGrid">
-      <div class="stat money"><span>Pozo del día</span><b id="pozo">$0</b><small id="pozoSub"></small></div>
-      <div class="stat money"><span>Para cada uno (líquido)</span><b id="perPerson">$0</b><small id="perPersonSub"></small></div>
-      <div class="stat"><span>Ritmo</span><b id="ritmo">—</b><small id="ritmoSub">mallas por hora</small></div>
-      <div class="stat"><span>Proyección al cierre</span><b id="proj">—</b><small id="projSub">si mantienen este ritmo</small></div>
-      <div class="stat month"><span>Si repiten un día así lo que queda del mes</span><b id="monthProj">$0</b><small id="monthSub"></small></div>
-    </div>
-    <p class="disc">Montos y cierres referenciales · el cierre oficial lo valida administración con el inventario.</p>
+    <div class="chips" id="pmChips"></div>
   </div>
 
-  <!-- ============ REPORTERÍA ============ -->
-  <div id="report" style="display:none">
-    <div class="brandRow">
-      <div class="brand"><div class="ti">TI</div><span>THE ICE</span></div>
-      <div class="dateLab" id="repMonthLab"></div>
-    </div>
-    <h1 class="mega" style="font-size:44px">Reportería<br><span class="lime" id="repMes"></span></h1>
-    <p class="lede">Lo que lleva acumulado el equipo este mes.</p>
+  <div class="card">
+    <p class="sec">02 · Inventario al iniciar</p>
+    <p class="secSub">Mallas en bodega por producto. Los kilos se calculan solos.</p>
 
-    <div class="repGrid">
-      <div class="rep limeV"><span>Mallas del mes</span><b id="repBags">0</b><small id="repShifts"></small></div>
-      <div class="rep aguaV"><span>Kilos del mes</span><b id="repKg">0</b><small>producción acumulada</small></div>
-      <div class="rep limeV"><span>Pozo acumulado (bruto)</span><b id="repPozo">$0</b><small id="repPP"></small></div>
-      <div class="rep"><span>Promedio por turno</span><b id="repAvg">0</b><small>mallas por día trabajado</small></div>
-      <div class="rep alert ok" id="repAlert">
-        <span>Días bajo la base</span><b id="repBelow">0 de 3</b>
-        <small id="repBelowSub"></small>
+    <div class="invGrid">
+      <div class="invBox">
+        <h4>Pack 15 kg</h4>
+        <div class="tag">Original · 15 kg por malla</div>
+        <input id="inv0" type="number" min="0" value="0" inputmode="numeric">
+        <div class="kgLab"><b id="kg0">0</b>kg en bodega</div>
+      </div>
+
+      <div class="invBox">
+        <h4>Pack 12 kg</h4>
+        <div class="tag">Original · 12 kg por malla</div>
+        <input id="inv1" type="number" min="0" value="0" inputmode="numeric">
+        <div class="kgLab"><b id="kg1">0</b>kg en bodega</div>
+      </div>
+
+      <div class="invBox">
+        <h4>Pack 15 kg</h4>
+        <div class="tag">Mini · 15 kg por malla</div>
+        <input id="inv2" type="number" min="0" value="0" inputmode="numeric">
+        <div class="kgLab"><b id="kg2">0</b>kg en bodega</div>
       </div>
     </div>
 
-    <div class="card">
-      <p class="sec">Turnos registrados</p>
-      <div class="histList" id="histList"></div>
-    </div>
-
-    <button class="ghostBtn" id="repBack">← Volver</button>
-    <p class="disc">Reportería referencial · los montos definitivos se confirman en el cierre formal de administración con los inventarios.</p>
-  </div>
-
-  <!-- ============ SUMMARY ============ -->
-  <div class="overlay" id="overlay">
-    <div class="sumCard" id="sumCard">
-      <h2>Cierre de turno</h2>
-      <p class="sumSub" id="sumSub"></p>
-      <div class="sumGrid">
-        <div><span>Mallas</span><b id="sumBags">0</b></div>
-        <div><span>Kilos producidos</span><b id="sumKg" style="color:var(--agua)">0</b></div>
-        <div><span>Promedio por persona</span><b id="sumAvg">0</b></div>
-        <div><span>Nivel logrado</span><b id="sumLevel">—</b></div>
-        <div><span>Duración</span><b id="sumTime">—</b></div>
-        <div><span>Personas</span><b id="sumPeople">—</b></div>
-        <div><span>Pozo del día</span><b id="sumPozo" style="color:var(--lime)">$0</b></div>
-        <div><span>Por persona (líq.)</span><b id="sumPP" style="color:var(--lime)">$0</b></div>
-      </div>
-      <button class="startBtn" id="saveBtn" style="margin-top:0">Guardar y cerrar turno</button>
-      <button class="ghostBtn" id="backBtn">Volver al turno</button>
-      <p class="disc" style="margin-top:14px">Cifras referenciales · el cierre oficial lo valida administración con el inventario.</p>
+    <div class="totalInv">
+      <span class="lab">Total inventario</span>
+      <b id="totInvM">0</b><span>mallas</span>
+      <b id="totInvK">0</b><span>kg</span>
     </div>
   </div>
+
+  <button class="startBtn" id="startBtn" disabled>Iniciar turno</button>
+  <button class="ghostBtn" id="repBtn">Reportería del mes</button>
+  <div class="warnLine" id="setupWarn"></div>
+</div>
+
+<div id="main" style="display:none">
+  <div class="topbar">
+    <div class="clock"><small>Turno en curso</small><span id="clock">00:00:00</span></div>
+    <div style="text-align:right">
+      <div class="crewLab" id="crew"></div>
+      <button class="endBtn" id="endBtn">Terminar</button>
+    </div>
+  </div>
+
+  <div class="metaStrip">
+    <div class="metaBox"><span>Bodega ahora</span><b id="invNowTotal">0</b></div>
+    <div class="metaBox kg"><span>Kilos de hoy</span><b id="kgToday">0</b></div>
+    <div class="metaBox hl"><span>Meta base</span><b id="metaBase">190</b></div>
+    <div class="metaBox"><span>Bono desde</span><b id="metaTrig">212</b></div>
+  </div>
+
+  <div class="card">
+    <p class="sec">Producción del turno</p>
+    <p class="secSub">Toca +10 para avanzar rápido o pincha el número para escribir la cantidad exacta.</p>
+    <div class="prodGrid" id="prodGrid"></div>
+
+    <div class="totalRow">
+      <span class="lab">Llevan</span>
+      <div class="big" id="totalBags">0</div>
+      <span class="kgs" id="totalKgLab"></span>
+    </div>
+
+    <div class="kgBig" id="kgBig">0 kg producidos</div>
+
+    <div class="barWrap">
+      <div class="bar"><div class="fill" id="fill"></div></div>
+      <div id="marks"></div>
+    </div>
+  </div>
+
+  <div class="msg" id="msg">
+    <div class="t1" id="msgT1"></div>
+    <div class="t2" id="msgT2"></div>
+  </div>
+
+  <div class="statGrid">
+    <div class="stat money"><span>Pozo del día</span><b id="pozo">$0</b><small id="pozoSub"></small></div>
+    <div class="stat money"><span>Para cada uno (líquido)</span><b id="perPerson">$0</b><small id="perPersonSub"></small></div>
+    <div class="stat"><span>Ritmo</span><b id="ritmo">—</b><small id="ritmoSub">mallas por hora</small></div>
+    <div class="stat"><span>Proyección al cierre</span><b id="proj">—</b><small id="projSub"></small></div>
+    <div class="stat month"><span>Proyección mensual</span><b id="monthProj">$0</b><small id="monthSub"></small></div>
+  </div>
+</div>
+
+<div id="report" style="display:none">
+  <div class="brandRow">
+    <div class="brand"><div class="ti">TI</div><span>THE ICE</span></div>
+    <div class="dateLab" id="repMonthLab"></div>
+  </div>
+
+  <h1 class="mega" style="font-size:44px">Reportería<br><span class="lime" id="repMes"></span></h1>
+
+  <div class="repGrid">
+    <div class="rep limeV"><span>Mallas del mes</span><b id="repBags">0</b><small id="repShifts"></small></div>
+    <div class="rep aguaV"><span>Kilos del mes</span><b id="repKg">0</b></div>
+    <div class="rep limeV"><span>Pozo acumulado</span><b id="repPozo">$0</b><small id="repPP"></small></div>
+    <div class="rep"><span>Promedio por turno</span><b id="repAvg">0</b></div>
+    <div class="rep alert ok" id="repAlert">
+      <span>Días bajo la base</span>
+      <b id="repBelow">0 de 3</b>
+      <small id="repBelowSub"></small>
+    </div>
+  </div>
+
+  <div class="card">
+    <p class="sec">Turnos registrados</p>
+    <div class="histList" id="histList"></div>
+  </div>
+
+  <div class="card">
+    <p class="sec">Administrar días</p>
+    <p class="secSub">Borra un día específico, todos los días del mes o reinicia el historial completo.</p>
+    <div class="historyActions">
+      <button class="ghostBtn dangerBtn" id="deleteMonthBtn">Borrar días de este mes</button>
+      <button class="ghostBtn dangerBtn strong" id="resetHistoryBtn">Reiniciar historial completo</button>
+    </div>
+  </div>
+
+  <button class="ghostBtn" id="repBack">← Volver</button>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="sumCard" id="sumCard">
+    <h2>Cierre de turno</h2>
+    <p class="sumSub" id="sumSub"></p>
+
+    <div class="sumGrid">
+      <div><span>Mallas</span><b id="sumBags">0</b></div>
+      <div><span>Kilos producidos</span><b id="sumKg">0</b></div>
+      <div><span>Promedio por persona</span><b id="sumAvg">0</b></div>
+      <div><span>Nivel logrado</span><b id="sumLevel">—</b></div>
+      <div><span>Duración</span><b id="sumTime">—</b></div>
+      <div><span>Personas</span><b id="sumPeople">—</b></div>
+      <div><span>Pozo del día</span><b id="sumPozo">$0</b></div>
+      <div><span>Por persona</span><b id="sumPP">$0</b></div>
+    </div>
+
+    <button class="startBtn" id="saveBtn">Guardar y cerrar turno</button>
+    <button class="ghostBtn" id="backBtn">Volver al turno</button>
+  </div>
+</div>
 
 </div>
+
 <script>
 (function(){
-  // ------- modelo (mismo que la calculadora) -------
-  const COST=37000, TARGET=70, KGBAG=15, NET=.76, REF=6, MAX_BELOW=3;
-  const TH=[190,220,260,300,360], SHARES=[1,.8,.7,.6];
-  const RAMP=['#4ec9f2','#63e0c0','#c9f24e','#ffd23f','#ff9f1c','#ff5c38'];
-  const MARKCOL={base:'#c9f24e',bono:'#ffd23f',n2:'#ff9f1c',n3:'#ff9f1c',meta:'#ff5c38'};
-  const PRODUCTS=[
-    {name:"Pack 15 kg",tag:"Original",kg:15},
-    {name:"Pack 12 kg",tag:"Original",kg:12},
-    {name:"Pack 15 kg",tag:"Mini",kg:15},
-  ];
-  const FIXED_BASE=["Kevin","Wilfredo","Nicol","José","Santiago"];
-  const PT_BASE=["Breiner","Marlon"];
-  const $=id=>document.getElementById(id);
-  const fmt=n=>new Intl.NumberFormat('es-CL').format(Math.round(n));
-  const money=n=>"$"+fmt(n);
-  const DIAS=['DOMINGO','LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO'];
-  const DIAS_S=['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
-  const MESES=['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
-  const MESES_L=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  const hoy=new Date();
-  $('dateLab').textContent=DIAS[hoy.getDay()]+', '+hoy.getDate()+' '+MESES[hoy.getMonth()];
-  const monthKey=d=>{const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')};
+const COST=37000, TARGET=70, KGBAG=15, NET=.76, REF=6, MAX_BELOW=3;
+const TH=[190,220,260,300,360], SHARES=[1,.8,.7,.6];
+const RAMP=['#4ec9f2','#63e0c0','#c9f24e','#ffd23f','#ff9f1c','#ff5c38'];
+const PRODUCTS=[
+  {name:"Pack 15 kg",tag:"Original",kg:15},
+  {name:"Pack 12 kg",tag:"Original",kg:12},
+  {name:"Pack 15 kg",tag:"Mini",kg:15}
+];
 
-  // ------- estado -------
-  let S=null;
-  try{S=JSON.parse(localStorage.getItem('turnoState')||'null')}catch(e){}
-  let fixedNames=FIXED_BASE.slice();
-  try{const f=JSON.parse(localStorage.getItem('fixedNames')||'null'); if(Array.isArray(f)) fixedNames=f;}catch(e){}
-  let ptNames=PT_BASE.slice();
-  try{const n=JSON.parse(localStorage.getItem('ptNames')||'null'); if(Array.isArray(n)) ptNames=n;}catch(e){}
-  let editMode=false;
-  function persistNames(){localStorage.setItem('fixedNames',JSON.stringify(fixedNames));localStorage.setItem('ptNames',JSON.stringify(ptNames))}
-  let history=[];
-  try{const h=JSON.parse(localStorage.getItem('turnoHistory')||'null'); if(Array.isArray(h)) history=h;}catch(e){}
-  let selected=new Set();
-  let lastMilestone=-1;
-  function save(){localStorage.setItem('turnoState',JSON.stringify(S))}
-  function saveHist(){localStorage.setItem('turnoHistory',JSON.stringify(history))}
+const ROSTER_BASE={
+  am:["Kevin","Wilfredo","Jose","John","Marlon"],
+  extension:[],
+  pm:["Santiago","Amaiker"]
+};
 
-  // ------- math -------
-  function scaled(p){const f=p/REF;return TH.map(x=>Math.round(x*f))}
-  function trigger(p){return Math.floor(p*COST/(TARGET*KGBAG))+1}
-  function totKg(){return S.counts.reduce((a,c,i)=>a+c*PRODUCTS[i].kg,0)}
-  function mallasEq(kg){return kg/KGBAG}
-  function pozoAt(kg,p){
-    const labor=p*COST, sav=Math.max(0,TARGET*kg-labor);
-    if(sav<=0)return{sav:0,share:0,pozo:0,li:-1};
-    const th=scaled(p), m=mallasEq(kg);
-    let li=-1; th.forEach((t,i)=>{if(m>=t)li=i});
-    const share=li>=2?SHARES[Math.min(li-1,3)]:SHARES[0];
-    return{sav,share,pozo:sav*share,li};
+const ROSTER_LABELS={
+  am:"Turno AM",
+  extension:"Turno extensión",
+  pm:"Turno PM"
+};
+
+const $=id=>document.getElementById(id);
+const fmt=n=>new Intl.NumberFormat('es-CL').format(Math.round(n));
+const money=n=>"$"+fmt(n);
+const DIAS=['DOMINGO','LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO'];
+const DIAS_S=['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
+const MESES=['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+const MESES_L=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const hoy=new Date();
+
+$('dateLab').textContent=DIAS[hoy.getDay()]+', '+hoy.getDate()+' '+MESES[hoy.getMonth()];
+
+const monthKey=d=>{
+  const x=new Date(d);
+  return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0');
+};
+
+let S=null;
+try{S=JSON.parse(localStorage.getItem('turnoState')||'null')}catch(e){}
+
+let rosters=JSON.parse(JSON.stringify(ROSTER_BASE));
+try{
+  const saved=JSON.parse(localStorage.getItem('shiftRostersV2')||'null');
+  if(saved){
+    Object.keys(ROSTER_BASE).forEach(k=>{
+      if(Array.isArray(saved[k]))rosters[k]=saved[k];
+    });
   }
-  // Regla: el pozo nunca baja — al cruzar de nivel se conserva lo ya logrado
-  function pozoEffAt(kg,p){
-    const th=scaled(p), m=mallasEq(kg), r=pozoAt(kg,p);
-    let best=r.pozo;
-    [2,3,4].forEach(i=>{if(m>=th[i]) best=Math.max(best,pozoAt((th[i]-1)*KGBAG,p).pozo)});
-    return {sav:r.sav, share:r.share, li:r.li, pozoRaw:r.pozo, pozo:best, frozen:best>r.pozo+0.5};
-  }
-  function recoveryBag(p,fromBags,floor){
-    for(let b=Math.ceil(fromBags);b<=Math.ceil(fromBags)+200;b++){
-      if(pozoAt(b*KGBAG,p).pozo>floor+0.5) return b;
+}catch(e){}
+
+let history=[];
+try{
+  const saved=JSON.parse(localStorage.getItem('turnoHistory')||'null');
+  if(Array.isArray(saved))history=saved;
+}catch(e){}
+
+let deletedDays=new Set();
+try{
+  const saved=JSON.parse(localStorage.getItem('deletedTurnoDays')||'[]');
+  if(Array.isArray(saved))deletedDays=new Set(saved.map(String));
+}catch(e){}
+
+let editMode=false;
+let selected=new Set();
+let lastMilestone=-1;
+let reportSource=null;
+
+function save(){localStorage.setItem('turnoState',JSON.stringify(S))}
+function saveHist(){localStorage.setItem('turnoHistory',JSON.stringify(history))}
+function saveDeleted(){localStorage.setItem('deletedTurnoDays',JSON.stringify([...deletedDays]))}
+function persistNames(){localStorage.setItem('shiftRostersV2',JSON.stringify(rosters))}
+const personId=(group,name)=>group+'::'+name;
+
+function selectedCrew(){
+  const crew=[];
+  const byShift={am:[],extension:[],pm:[]};
+
+  Object.keys(rosters).forEach(group=>{
+    rosters[group].forEach(name=>{
+      if(selected.has(personId(group,name))){
+        crew.push(name);
+        byShift[group].push(name);
+      }
+    });
+  });
+
+  return{crew,byShift};
+}
+
+function scaled(p){
+  const factor=p/REF;
+  return TH.map(x=>Math.round(x*factor));
+}
+
+function trigger(p){
+  return Math.floor(p*COST/(TARGET*KGBAG))+1;
+}
+
+function totKg(){
+  return S.counts.reduce((total,count,i)=>total+count*PRODUCTS[i].kg,0);
+}
+
+function mallasEq(kg){return kg/KGBAG}
+
+function pozoAt(kg,p){
+  const labor=p*COST;
+  const sav=Math.max(0,TARGET*kg-labor);
+
+  if(sav<=0)return{sav:0,share:0,pozo:0,li:-1};
+
+  const thresholds=scaled(p);
+  const mallas=mallasEq(kg);
+  let level=-1;
+
+  thresholds.forEach((value,i)=>{
+    if(mallas>=value)level=i;
+  });
+
+  const share=level>=2?SHARES[Math.min(level-1,3)]:SHARES[0];
+
+  return{sav,share,pozo:sav*share,li:level};
+}
+
+function pozoEffAt(kg,p){
+  const thresholds=scaled(p);
+  const mallas=mallasEq(kg);
+  const result=pozoAt(kg,p);
+  let best=result.pozo;
+
+  [2,3,4].forEach(i=>{
+    if(mallas>=thresholds[i]){
+      best=Math.max(best,pozoAt((thresholds[i]-1)*KGBAG,p).pozo);
     }
+  });
+
+  return{
+    sav:result.sav,
+    share:result.share,
+    li:result.li,
+    pozo:best,
+    frozen:best>result.pozo+0.5
+  };
+}
+
+function belowThisMonth(){
+  const mk=monthKey(Date.now());
+  return history.filter(item=>item.month===mk&&item.below).length;
+}
+
+function updInv(){
+  let totalMallas=0;
+  let totalKg=0;
+
+  PRODUCTS.forEach((product,i)=>{
+    const value=+$('inv'+i).value||0;
+    $('kg'+i).textContent=fmt(value*product.kg);
+    totalMallas+=value;
+    totalKg+=value*product.kg;
+  });
+
+  $('totInvM').textContent=fmt(totalMallas);
+  $('totInvK').textContent=fmt(totalKg);
+}
+
+[0,1,2].forEach(i=>{
+  $('inv'+i).addEventListener('input',updInv);
+});
+
+function chipEl(name,group){
+  const id=personId(group,name);
+  const chip=document.createElement(editMode?'div':'button');
+
+  if(!editMode)chip.type='button';
+
+  chip.className='chip'+(group!=='am'?' pt':'')+(!editMode&&selected.has(id)?' on':'');
+
+  if(!editMode){
+    chip.setAttribute('aria-pressed',selected.has(id)?'true':'false');
+  }
+
+  chip.appendChild(document.createTextNode(name));
+
+  if(editMode){
+    const del=document.createElement('button');
+    del.type='button';
+    del.className='mini del';
+    del.textContent='✕';
+    del.setAttribute('aria-label','Eliminar a '+name);
+
+    del.onclick=event=>{
+      event.stopPropagation();
+
+      if(!confirm('¿Eliminar a '+name+' de '+ROSTER_LABELS[group]+'?'))return;
+
+      rosters[group]=rosters[group].filter(item=>item!==name);
+      selected.delete(id);
+      persistNames();
+      renderChips();
+    };
+
+    chip.appendChild(del);
+  }else{
+    chip.onclick=()=>{
+      selected.has(id)?selected.delete(id):selected.add(id);
+      renderChips();
+    };
+  }
+
+  return chip;
+}
+
+function renderChips(){
+  Object.keys(rosters).forEach(group=>{
+    const container=$(group+'Chips');
+    container.innerHTML='';
+
+    rosters[group].forEach(name=>{
+      container.appendChild(chipEl(name,group));
+    });
+
+    if(group!=='am'){
+      const pending=document.createElement(editMode?'button':'div');
+
+      if(editMode){
+        pending.type='button';
+        pending.onclick=()=>{
+          document.querySelector('.addPerson[data-group="'+group+'"]').click();
+        };
+      }
+
+      pending.className='chip add';
+      pending.textContent='Por agregar';
+      container.appendChild(pending);
+    }
+  });
+
+  $('editNames').textContent=editMode?'✓ Guardar':'Configurar';
+  $('editNames').className='editBtn'+(editMode?' on':'');
+  $('rosterCard').classList.toggle('editing',editMode);
+  $('pCount').textContent=selected.size+(selected.size===1?' persona':' personas');
+  $('startBtn').disabled=selected.size===0||editMode;
+}
+
+$('editNames').onclick=()=>{
+  editMode=!editMode;
+  renderChips();
+};
+
+document.querySelectorAll('.addPerson').forEach(button=>{
+  button.onclick=()=>{
+    const group=button.dataset.group;
+    const value=prompt('Nombre para '+ROSTER_LABELS[group]+':');
+
+    if(!value||!value.trim())return;
+
+    const name=value.trim();
+    const exists=Object.values(rosters).flat().some(item=>
+      item.toLocaleLowerCase('es')===name.toLocaleLowerCase('es')
+    );
+
+    if(exists){
+      alert(name+' ya está agregado en otro turno.');
+      return;
+    }
+
+    rosters[group].push(name);
+    persistNames();
+    renderChips();
+  };
+});
+
+function renderSetupWarn(){
+  const below=belowThisMonth();
+  const warning=$('setupWarn');
+
+  if(below>0){
+    warning.style.display='block';
+    warning.textContent=below>=MAX_BELOW
+      ?'Ya llevan '+below+' días bajo la base este mes.'
+      :'Llevan '+below+' de '+MAX_BELOW+' días bajo la base este mes.';
+  }else{
+    warning.style.display='none';
+  }
+}
+
+$('startBtn').onclick=()=>{
+  const chosen=selectedCrew();
+
+  S={
+    start:Date.now(),
+    crew:chosen.crew,
+    crewByShift:chosen.byShift,
+    inv:[
+      +$('inv0').value||0,
+      +$('inv1').value||0,
+      +$('inv2').value||0
+    ],
+    counts:[0,0,0]
+  };
+
+  lastMilestone=-1;
+  save();
+  showMain();
+};
+
+function showMain(){
+  $('setup').style.display='none';
+  $('report').style.display='none';
+  $('main').style.display='block';
+
+  const people=S.crew.length;
+  const thresholds=scaled(people);
+
+  const crewText=S.crewByShift
+    ?Object.keys(ROSTER_LABELS)
+      .filter(key=>S.crewByShift[key]&&S.crewByShift[key].length)
+      .map(key=>ROSTER_LABELS[key]+': '+S.crewByShift[key].join(', '))
+      .join(' · ')
+    :S.crew.join(' · ');
+
+  $('crew').textContent=people+' personas · '+crewText;
+  $('metaBase').textContent=thresholds[0];
+  $('metaTrig').textContent=trigger(people);
+
+  const grid=$('prodGrid');
+  grid.innerHTML='';
+
+  PRODUCTS.forEach((product,i)=>{
+    grid.insertAdjacentHTML('beforeend',`
+      <div class="prod">
+        <h4>${product.name}</h4>
+        <div class="invNow">${product.tag} · bodega: <b id="invNow${i}">0</b></div>
+        <div class="kgProd" id="kgProd${i}">0 kg</div>
+        <input
+          class="n countInput"
+          id="cnt${i}"
+          type="number"
+          min="0"
+          step="1"
+          value="${S.counts[i]}"
+          inputmode="numeric"
+          aria-label="Cantidad de ${product.name} ${product.tag}"
+        >
+        <div class="bRow">
+          <button class="minus" data-i="${i}" data-d="-10">−10</button>
+          <button class="plus" data-i="${i}" data-d="10">+10</button>
+        </div>
+      </div>
+    `);
+  });
+
+  grid.querySelectorAll('.bRow button').forEach(button=>{
+    button.onclick=()=>{
+      const i=+button.dataset.i;
+      const difference=+button.dataset.d;
+
+      S.counts[i]=Math.max(0,S.counts[i]+difference);
+      save();
+      update();
+    };
+  });
+
+  grid.querySelectorAll('.countInput').forEach(input=>{
+    input.onfocus=()=>input.select();
+
+    input.oninput=()=>{
+      const i=+input.id.replace('cnt','');
+      S.counts[i]=Math.max(0,Math.floor(Number(input.value)||0));
+      save();
+      update();
+    };
+  });
+
+  buildMarks();
+  update();
+}
+
+function buildMarks(){
+  const people=S.crew.length;
+  const thresholds=scaled(people);
+  const max=thresholds[4]*1.12;
+  const marks=$('marks');
+
+  marks.innerHTML='';
+
+  const items=[
+    [thresholds[0],'Base'],
+    [trigger(people),'Bono'],
+    [thresholds[2],'N2'],
+    [thresholds[3],'N3'],
+    [thresholds[4],'Meta']
+  ];
+
+  items.forEach(([value,label])=>{
+    const percentage=Math.min(100,value/max*100);
+
+    marks.insertAdjacentHTML('beforeend',`
+      <div class="mark" data-v="${value}" style="left:${percentage}%"></div>
+      <div class="markLab" data-v="${value}" style="left:${percentage}%">
+        <b>${label}</b>${value}
+      </div>
+    `);
+  });
+}
+
+function update(){
+  const people=S.crew.length;
+  const thresholds=scaled(people);
+  const bonusTrigger=trigger(people);
+  const bags=S.counts.reduce((a,b)=>a+b,0);
+  const kg=totKg();
+  const equivalent=mallasEq(kg);
+
+  PRODUCTS.forEach((product,i)=>{
+    $('cnt'+i).value=S.counts[i];
+    $('invNow'+i).textContent=S.inv[i]+S.counts[i];
+    $('kgProd'+i).textContent=fmt(S.counts[i]*product.kg)+' kg';
+  });
+
+  $('invNowTotal').textContent=fmt(S.inv.reduce((a,b)=>a+b,0)+bags);
+  $('kgToday').textContent=fmt(kg);
+  $('totalBags').textContent=bags;
+  $('totalKgLab').textContent='mallas';
+  $('kgBig').textContent=fmt(kg)+' kg producidos';
+
+  const max=thresholds[4]*1.12;
+  const percentage=Math.min(100,equivalent/max*100);
+  $('fill').style.width=percentage+'%';
+
+  const result=pozoEffAt(kg,people);
+  const perPerson=people?result.pozo/people*NET:0;
+
+  $('pozo').textContent=money(result.pozo);
+  $('perPerson').textContent=money(perPerson);
+
+  if(equivalent<thresholds[0]){
+    $('msgT1').textContent='Faltan '+fmt(thresholds[0]-equivalent)+' mallas para la base';
+    $('msgT2').textContent='La base del turno son '+thresholds[0]+' mallas.';
+  }else if(equivalent<bonusTrigger){
+    $('msgT1').textContent='¡Base lista!';
+    $('msgT2').textContent='Faltan '+fmt(bonusTrigger-equivalent)+' mallas para activar el bono.';
+  }else{
+    $('msgT1').textContent='¡Bono activo!';
+    $('msgT2').textContent='El pozo del equipo sigue creciendo.';
+  }
+
+  document.querySelectorAll('.mark').forEach(mark=>{
+    mark.style.background=equivalent>=+mark.dataset.v?'var(--lime)':'var(--line2)';
+  });
+
+  const elapsed=Math.max(.01,(Date.now()-S.start)/36e5);
+  const rate=equivalent/elapsed;
+
+  $('ritmo').textContent=equivalent?rate.toFixed(0)+' mallas/h':'—';
+  $('ritmoSub').textContent=equivalent?'ritmo actual de producción':'mallas por hora';
+  $('proj').textContent=equivalent?'~'+fmt(rate*8)+' mallas':'—';
+  $('projSub').textContent='proyección para 8 horas';
+  $('monthProj').textContent=perPerson?money(perPerson*20):'$0';
+  $('monthSub').textContent='estimación por persona para 20 turnos';
+}
+
+setInterval(()=>{
+  if(!S||$('main').style.display==='none')return;
+
+  const seconds=Math.floor((Date.now()-S.start)/1000);
+  $('clock').textContent=[
+    seconds/3600,
+    seconds/60%60,
+    seconds%60
+  ].map(value=>String(Math.floor(value)).padStart(2,'0')).join(':');
+},1000);
+
+$('endBtn').onclick=()=>{
+  const people=S.crew.length;
+  const kg=totKg();
+  const equivalent=mallasEq(kg);
+  const result=pozoEffAt(kg,people);
+  const thresholds=scaled(people);
+  const bags=S.counts.reduce((a,b)=>a+b,0);
+  const elapsed=Math.floor((Date.now()-S.start)/1000);
+
+  $('sumBags').textContent=bags;
+  $('sumKg').textContent=fmt(kg)+' kg';
+  $('sumAvg').textContent=(people?bags/people:0).toFixed(1)+' mallas';
+  $('sumLevel').textContent=equivalent>=thresholds[4]?'Meta':equivalent>=thresholds[0]?'Base':'—';
+  $('sumTime').textContent=Math.floor(elapsed/3600)+'h '+Math.floor(elapsed/60%60)+'m';
+  $('sumPeople').textContent=people;
+  $('sumPozo').textContent=money(result.pozo);
+  $('sumPP').textContent=money(people?result.pozo/people*NET:0);
+  $('sumSub').textContent=result.pozo>0?'¡Buen turno!':'Turno finalizado.';
+
+  $('overlay').classList.add('show');
+};
+
+$('backBtn').onclick=()=>{
+  $('overlay').classList.remove('show');
+};
+
+$('saveBtn').onclick=()=>{
+  const people=S.crew.length;
+  const kg=totKg();
+  const equivalent=mallasEq(kg);
+  const result=pozoEffAt(kg,people);
+  const thresholds=scaled(people);
+  const bags=S.counts.reduce((a,b)=>a+b,0);
+
+  const record={
+    ts:S.start,
+    month:monthKey(S.start),
+    people,
+    bags,
+    kg,
+    m:Math.round(equivalent*10)/10,
+    level:equivalent>=thresholds[4]?'Meta':equivalent>=thresholds[0]?'Base':'—',
+    pozo:Math.round(result.pozo),
+    ppLiq:Math.round(people?result.pozo/people*NET:0),
+    below:equivalent<thresholds[0],
+    crew:S.crew
+  };
+
+  history.push(record);
+  saveHist();
+
+  fetch('/api/turnos',{
+    method:'POST',
+    headers:{'content-type':'application/json'},
+    body:JSON.stringify(record)
+  }).catch(()=>{});
+
+  localStorage.removeItem('turnoState');
+  S=null;
+  selected=new Set();
+
+  $('overlay').classList.remove('show');
+  $('main').style.display='none';
+  $('setup').style.display='block';
+
+  renderChips();
+  updInv();
+  renderSetupWarn();
+};
+
+async function fetchServer(){
+  try{
+    const response=await fetch('/api/turnos',{cache:'no-store'});
+    if(!response.ok)throw new Error();
+    const data=await response.json();
+    return Array.isArray(data)?data:null;
+  }catch(e){
     return null;
   }
-  function zone(m,th,trig){
-    if(m>=th[4])return 5;
-    if(m>=th[2])return 4;
-    if(m>=trig)return 3;
-    if(m>=th[0])return 2;
-    if(m>=th[0]/2)return 1;
-    return 0;
-  }
-  function belowThisMonth(){
-    const mk=monthKey(Date.now());
-    return history.filter(h=>h.month===mk&&h.below).length;
+}
+
+const visibleRecords=list=>(list||[]).filter(item=>
+  !deletedDays.has(String(item.ts))
+);
+
+function requestServerDelete(ts){
+  fetch('/api/turnos?ts='+encodeURIComponent(ts),{
+    method:'DELETE'
+  }).catch(()=>{});
+}
+
+function removeRecords(records){
+  const ids=new Set(records.map(item=>String(item.ts)));
+
+  ids.forEach(id=>{
+    deletedDays.add(id);
+    requestServerDelete(id);
+  });
+
+  history=history.filter(item=>!ids.has(String(item.ts)));
+
+  if(reportSource){
+    reportSource=reportSource.filter(item=>!ids.has(String(item.ts)));
   }
 
-  // ------- inventario setup -------
-  function updInv(){
-    let tm=0,tk=0;
-    PRODUCTS.forEach((pr,i)=>{
-      const v=+$('inv'+i).value||0;
-      $('kg'+i).textContent=fmt(v*pr.kg);
-      tm+=v;tk+=v*pr.kg;
-    });
-    $('totInvM').textContent=fmt(tm);$('totInvK').textContent=fmt(tk);
-  }
-  [0,1,2].forEach(i=>$('inv'+i).addEventListener('input',updInv));
+  saveHist();
+  saveDeleted();
+  renderReport(reportSource||history);
+}
 
-  // ------- setup screen -------
-  function chipEl(n,isPt){
-    const c=document.createElement('div');
-    c.className='chip'+(isPt?' pt':'')+(!editMode&&selected.has(n)?' on':'');
-    c.appendChild(document.createTextNode(n));
-    if(editMode){
-      if(isPt){
-        const pin=document.createElement('span');pin.className='mini pin';pin.textContent='📌 fijar';
-        pin.onclick=e=>{e.stopPropagation();ptNames=ptNames.filter(x=>x!==n);if(!fixedNames.includes(n))fixedNames.push(n);persistNames();renderChips()};
-        c.appendChild(pin);
-      }
-      const del=document.createElement('span');del.className='mini del';del.textContent='✕';
-      del.onclick=e=>{e.stopPropagation();
-        if(!confirm('¿Eliminar a '+n+' de la lista?'))return;
-        fixedNames=fixedNames.filter(x=>x!==n);ptNames=ptNames.filter(x=>x!==n);
-        selected.delete(n);persistNames();renderChips()};
-      c.appendChild(del);
-    }else{
-      c.onclick=()=>{selected.has(n)?selected.delete(n):selected.add(n);renderChips()};
-    }
-    return c;
+function renderReport(list){
+  if(list)reportSource=visibleRecords(list);
+
+  const source=visibleRecords(reportSource||history);
+  const mk=monthKey(Date.now());
+  const rows=source.filter(item=>item.month===mk);
+
+  $('repMes').textContent=MESES_L[hoy.getMonth()];
+  $('repMonthLab').textContent=MESES_L[hoy.getMonth()].toUpperCase()+' '+hoy.getFullYear();
+
+  const bags=rows.reduce((total,item)=>total+item.bags,0);
+  const kg=rows.reduce((total,item)=>total+item.kg,0);
+  const pozo=rows.reduce((total,item)=>total+item.pozo,0);
+  const pp=rows.reduce((total,item)=>total+item.ppLiq,0);
+
+  $('repBags').textContent=fmt(bags);
+  $('repShifts').textContent=rows.length+(rows.length===1?' turno registrado':' turnos registrados');
+  $('repKg').textContent=fmt(kg);
+  $('repPozo').textContent=money(pozo);
+  $('repPP').textContent='≈ '+money(pp)+' líquidos por persona';
+  $('repAvg').textContent=rows.length?fmt(bags/rows.length):0;
+
+  const below=rows.filter(item=>item.below).length;
+  $('repBelow').textContent=below+' de '+MAX_BELOW;
+
+  const alertBox=$('repAlert');
+
+  if(below===0){
+    alertBox.className='rep alert ok';
+    $('repBelowSub').textContent='Ningún día bajo la base este mes.';
+  }else if(below<MAX_BELOW){
+    alertBox.className='rep alert warn';
+    $('repBelowSub').textContent='Quedan '+(MAX_BELOW-below)+' días antes del límite.';
+  }else{
+    alertBox.className='rep alert bad';
+    $('repBelowSub').textContent='Se alcanzó el límite de días bajo la base.';
   }
-  function renderChips(){
-    const fx=$('fixedChips');fx.innerHTML='';
-    fixedNames.forEach(n=>fx.appendChild(chipEl(n,false)));
-    const pt=$('ptChips');pt.innerHTML='';
-    ptNames.forEach(n=>pt.appendChild(chipEl(n,true)));
-    const add=document.createElement('div');
-    add.className='chip add';add.textContent='＋ agregar operario';
-    add.onclick=()=>{
-      const n=prompt('Nombre del nuevo operario:');
-      if(n&&n.trim()){
-        const nn=n.trim();
-        if(!ptNames.includes(nn)&&!fixedNames.includes(nn)){ptNames.push(nn);persistNames()}
-        if(!editMode)selected.add(nn);
-        renderChips();
+
+  const listBox=$('histList');
+  listBox.innerHTML='';
+
+  if(!rows.length){
+    listBox.innerHTML='<div style="color:var(--muted);padding:10px 0">Aún no hay turnos guardados este mes.</div>';
+  }
+
+  rows.slice().reverse().forEach(item=>{
+    const date=new Date(item.ts);
+
+    listBox.insertAdjacentHTML('beforeend',`
+      <div class="histRow${item.below?' below':''}">
+        <div class="d">${DIAS_S[date.getDay()]} ${date.getDate()}</div>
+        <div class="v">${fmt(item.bags)} mallas · ${fmt(item.kg)} kg · ${item.people} pers.</div>
+        <div class="lvl">${item.below?'BAJO BASE':item.level}</div>
+        <div class="pz">${money(item.pozo)}</div>
+        <button
+          class="deleteDay"
+          data-ts="${item.ts}"
+          aria-label="Borrar turno del ${date.getDate()} de ${MESES_L[date.getMonth()]}"
+        >✕</button>
+      </div>
+    `);
+  });
+
+  listBox.querySelectorAll('.deleteDay').forEach(button=>{
+    button.onclick=()=>{
+      const record=source.find(item=>
+        String(item.ts)===String(button.dataset.ts)
+      );
+
+      if(!record)return;
+
+      const date=new Date(record.ts);
+
+      if(confirm(
+        '¿Borrar el turno del '+date.getDate()+' de '+
+        MESES_L[date.getMonth()]+'?'
+      )){
+        removeRecords([record]);
       }
     };
-    pt.appendChild(add);
-    const eb=$('editNames');
-    eb.textContent=editMode?'✓ listo':'✎ editar';
-    eb.className='editBtn'+(editMode?' on':'');
-    $('pCount').textContent=selected.size+(selected.size===1?' persona':' personas');
-    $('startBtn').disabled=selected.size===0||editMode;
-  }
-  $('editNames').onclick=()=>{editMode=!editMode;renderChips()};
-  function renderSetupWarn(){
-    const b=belowThisMonth(), w=$('setupWarn');
-    if(b>0){
-      w.style.display='block';
-      w.textContent=b>=MAX_BELOW
-        ?'⛔ Ya llevan '+b+' días bajo la base este mes — el bono mensual queda en revisión.'
-        :'⚠️ Llevan '+b+' de '+MAX_BELOW+' días bajo la base este mes. Al tercero se invalida el bono del mes.';
-    }else{w.style.display='none'}
-  }
-  $('startBtn').onclick=()=>{
-    S={start:Date.now(),crew:[...selected],inv:[+$('inv0').value||0,+$('inv1').value||0,+$('inv2').value||0],counts:[0,0,0]};
-    lastMilestone=-1;save();showMain();
-  };
+  });
+}
 
-  // ------- main screen -------
-  function showMain(){
-    $('setup').style.display='none';$('report').style.display='none';$('main').style.display='block';
-    const p=S.crew.length,th=scaled(p);
-    $('crew').textContent=p+' personas: '+S.crew.join(' · ');
-    $('metaBase').textContent=th[0];
-    $('metaTrig').textContent=trigger(p);
-    const grid=$('prodGrid');grid.innerHTML='';
-    PRODUCTS.forEach((pr,i)=>{
-      grid.insertAdjacentHTML('beforeend',`
-        <div class="prod">
-          <h4>${pr.name}</h4>
-          <div class="invNow">${pr.tag} · bodega: <b id="invNow${i}">0</b></div>
-          <div class="kgProd" id="kgProd${i}">0 kg</div>
-          <div class="n" id="cnt${i}">0</div>
-          <div class="bRow"><button class="minus" data-i="${i}" data-d="-1">−1</button><button class="plus" data-i="${i}" data-d="1">+1</button></div>
-        </div>`);
-    });
-    grid.querySelectorAll('button').forEach(b=>b.onclick=()=>{
-      const i=+b.dataset.i,d=+b.dataset.d;
-      S.counts[i]=Math.max(0,S.counts[i]+d);save();update();
-    });
-    buildMarks();update();
+$('repBtn').onclick=async()=>{
+  reportSource=null;
+  renderReport(history);
+
+  $('setup').style.display='none';
+  $('report').style.display='block';
+  window.scrollTo(0,0);
+
+  const serverRecords=await fetchServer();
+
+  if(serverRecords){
+    const cleanServer=visibleRecords(serverRecords);
+    const seen=new Set(cleanServer.map(item=>String(item.ts)));
+    const localOnly=visibleRecords(history).filter(item=>
+      !seen.has(String(item.ts))
+    );
+
+    const merged=[...cleanServer,...localOnly]
+      .sort((a,b)=>a.ts-b.ts);
+
+    renderReport(merged);
+  }
+};
+
+$('repBack').onclick=()=>{
+  $('report').style.display='none';
+  $('setup').style.display='block';
+};
+
+$('deleteMonthBtn').onclick=()=>{
+  const mk=monthKey(Date.now());
+  const rows=visibleRecords(reportSource||history)
+    .filter(item=>item.month===mk);
+
+  if(!rows.length){
+    alert('No hay días guardados este mes.');
+    return;
   }
 
-  function buildMarks(){
-    const p=S.crew.length,th=scaled(p),maxX=th[4]*1.12,box=$('marks');box.innerHTML='';
-    const items=[[th[0],'Base','base'],[trigger(p),'Bono','bono'],[th[2],'N2','n2'],[th[3],'N3','n3'],[th[4],'Meta','meta']];
-    items.forEach(([v,lab,key])=>{
-      const pct=Math.min(100,v/maxX*100);
-      box.insertAdjacentHTML('beforeend',`<div class="mark" data-v="${v}" data-k="${key}" style="left:${pct}%"></div>
-        <div class="markLab" data-v="${v}" data-k="${key}" style="left:${pct}%"><b>${lab}</b>${v}</div>`);
-    });
+  if(confirm('¿Borrar todos los turnos de '+MESES_L[hoy.getMonth()]+'?')){
+    removeRecords(rows);
+  }
+};
+
+$('resetHistoryBtn').onclick=()=>{
+  const rows=visibleRecords(reportSource||history);
+
+  if(!rows.length){
+    alert('El historial ya está vacío.');
+    return;
   }
 
-  function launchConfetti(){
-    const em=['🧊','💰','🔥','⭐','💪','🎉'];
-    for(let i=0;i<26;i++){
-      const d=document.createElement('div');d.className='confetti';
-      d.textContent=em[Math.floor(Math.random()*em.length)];
-      d.style.left=Math.random()*100+'vw';
-      d.style.animationDuration=(2+Math.random()*2)+'s';
-      document.body.appendChild(d);setTimeout(()=>d.remove(),4200);
-    }
+  if(confirm('¿Reiniciar todo el historial? Esta acción no se puede deshacer.')){
+    removeRecords(rows);
   }
+};
 
-  function workdaysLeft(){
-    const now=new Date();let c=0;
-    const end=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
-    for(let d=now.getDate()+1;d<=end;d++){
-      if(new Date(now.getFullYear(),now.getMonth(),d).getDay()!==0)c++;
-    }
-    return c;
-  }
-  // Turno por reloj: día 07-16 (colación 12-13) · noche 22-07 (colación 02-03) → 8 h efectivas
-  function shiftInfo(){
-    const st=new Date(S.start);
-    const day=st.getHours()>=4&&st.getHours()<15;
-    const s=new Date(st), e=new Date(st), l=new Date(st);
-    if(day){
-      s.setHours(7,0,0,0); e.setHours(16,0,0,0); l.setHours(12,0,0,0);
-    }else{
-      if(st.getHours()<4) s.setDate(s.getDate()-1);
-      s.setHours(22,0,0,0);
-      e.setTime(s.getTime()); e.setDate(e.getDate()+1); e.setHours(7,0,0,0);
-      l.setTime(s.getTime()); l.setDate(l.getDate()+1); l.setHours(2,0,0,0);
-    }
-    return {s,e,l};
-  }
-  function effHours(a,b,l){
-    if(b<=a) return 0;
-    let h=(b-a)/36e5;
-    const ls=Math.max(a.getTime(),l.getTime()), le=Math.min(b.getTime(),l.getTime()+36e5);
-    if(le>ls) h-=(le-ls)/36e5;
-    return Math.max(0,h);
-  }
-  const fmtH=h=>h.toFixed(1).replace('.',',');
+renderChips();
+updInv();
+renderSetupWarn();
 
-  function update(){
-    const p=S.crew.length,th=scaled(p),trig=trigger(p);
-    const bagsRaw=S.counts.reduce((a,b)=>a+b,0);
-    const kg=totKg(),m=mallasEq(kg);
-    PRODUCTS.forEach((pr,i)=>{
-      $('cnt'+i).textContent=S.counts[i];
-      $('invNow'+i).textContent=S.inv[i]+S.counts[i];
-      $('kgProd'+i).textContent=fmt(S.counts[i]*pr.kg)+' kg';
-    });
-    $('invNowTotal').textContent=fmt(S.inv.reduce((a,b)=>a+b,0)+bagsRaw);
-    $('kgToday').textContent=fmt(kg);
-    $('totalBags').textContent=bagsRaw;
-    $('totalKgLab').textContent='mallas'+(Math.abs(m-bagsRaw)>0.4?' · equivalen a '+fmt(m)+' de 15 kg':'');
-    $('kgBig').textContent=fmt(kg)+' kg producidos';
-
-    // barra
-    const z=zone(m,th,trig);
-    const maxX=th[4]*1.12,pct=Math.min(100,m/maxX*100);
-    const fill=$('fill');fill.style.width=pct+'%';
-    fill.style.background=z===0?RAMP[0]:'linear-gradient(90deg, '+RAMP.slice(0,z+1).join(', ')+')';
-    $('totalBags').style.color=RAMP[z];
-    document.querySelectorAll('.mark').forEach(el=>{
-      el.style.background=m>=+el.dataset.v?MARKCOL[el.dataset.k]:'var(--line2)';
-    });
-    document.querySelectorAll('.markLab').forEach(el=>{
-      el.querySelector('b').style.color=m>=+el.dataset.v?MARKCOL[el.dataset.k]:'var(--muted2)';
-    });
-
-    // pozo (regla: nunca baja)
-    const r=pozoEffAt(kg,p);
-    const perLiq=r.pozo/p*NET;
-    $('pozo').textContent=money(r.pozo);
-    $('pozoSub').textContent=r.pozo>0?(r.frozen?'pozo asegurado — nunca baja al subir de nivel':`el equipo se queda con el ${Math.round(r.share*100)}% del ahorro`):'se activa cuando el kilo baje de $'+TARGET;
-    $('perPerson').textContent=money(perLiq);
-    $('perPersonSub').textContent=r.pozo>0?'bruto: '+money(r.pozo/p)+' · líquido ~76%':'tu parte del pozo de hoy';
-
-    const nowPozo=r.pozo, plus30=Math.max(0,pozoEffAt(kg+30*KGBAG,p).pozo-nowPozo);
-    const oneMore=Math.max(0,pozoEffAt(kg+KGBAG,p).pozo-nowPozo);
-
-    // mensaje
-    let t1,t2,milestone,col=RAMP[z];
-    if(m<th[0]){milestone=0;
-      t1='Faltan '+fmt(th[0]-m)+' mallas para la base';
-      t2='La base del turno son '+th[0]+' mallas ('+p+' personas). ¡Vamos que se puede! 💪';
-    }else if(m<trig){milestone=1;
-      t1='¡Base lista! 🎉 Denle '+fmt(trig-m)+' más y gatillan el bono';
-      t2='Desde la malla '+trig+' cada kilo empieza a dejar plata al pozo del equipo.';
-    }else if(m<th[4]){milestone=2+Math.max(0,r.li-1);
-      const nextIdx=[1,2,3,4].find(i=>m<th[i]);
-      if(r.frozen){
-        const rb=recoveryBag(p,m,r.pozo);
-        t1='¡Nivel '+r.li+'! 🔥 Pozo asegurado: '+money(r.pozo);
-        t2='Lo logrado no se pierde: el pozo nunca baja. Desde la malla '+(rb||'—')+' vuelve a crecer con el '+Math.round(r.share*100)+'% del ahorro.';
-      }else{
-        t1='¡Bono activo! 🔥 +30 mallas = +'+money(plus30)+' al pozo';
-        t2='Cada malla ahora vale ~'+money(oneMore)+' al pozo · a '+fmt(th[nextIdx]-m)+' mallas de '+(nextIdx===4?'la META 🏆':'Nivel '+nextIdx)+'.';
-      }
-    }else{milestone=6;
-      t1='¡Meta cumplida — son máquinas! 🏆';
-      t2='Pasaron el Nivel 4 y cada malla extra sigue sumando ~'+money(oneMore)+' al pozo. Historia pura. 🧊🔥';
-    }
-    const msg=$('msg');
-    msg.style.borderColor=z>=2?col:'var(--line)';
-    msg.className='msg'+(z>=3?' pulse':'');
-    $('msgT1').textContent=t1;$('msgT1').style.color=col;
-    $('msgT2').textContent=t2;
-    if(milestone>lastMilestone&&milestone>=1&&bagsRaw>0){launchConfetti()}
-    if(bagsRaw>0)lastMilestone=Math.max(lastMilestone,milestone);
-
-    // ritmo por reloj del turno (8 h efectivas, colación descontada)
-    const si=shiftInfo(), now=new Date();
-    const worked=effHours(si.s,now,si.l), left=effHours(now,si.e,si.l);
-    if(worked>0.5&&m>0){
-      const rate=m/worked;
-      $('ritmo').textContent=rate.toFixed(0)+' mallas/h';
-      $('ritmoSub').textContent='llevan '+fmt(m)+' en '+fmtH(worked)+' h de turno · la base pide '+Math.ceil(th[0]/8)+'/h · Nivel 2 pide '+Math.ceil(th[2]/8)+'/h';
-      const projRaw=m+rate*left, projM=Math.min(projRaw,th[4]*1.25);
-      $('proj').textContent='~'+fmt(projM)+' mallas';
-      $('projSub').textContent='a este ritmo, con las '+fmtH(left)+' h que quedan de turno (colación descontada)';
-      const wd=workdaysLeft();
-      if(perLiq>0){
-        $('monthProj').textContent='+'+money(perLiq*wd)+' por persona';
-        $('monthSub').textContent='el pozo que YA llevan hoy ('+money(perLiq)+' líq./persona) repetido los '+wd+' días que quedan del mes (sin domingos).';
-      }else{
-        $('monthProj').textContent='$0';
-        $('monthSub').textContent='se calcula con el pozo real del día — se activa al pasar la malla '+trig+'.';
-      }
-    }else{
-      $('ritmo').textContent='—';$('proj').textContent='—';
-      $('monthProj').textContent='$0';$('monthSub').textContent='parte el conteo y te mostramos cuánto pueden sumar al mes.';
-    }
-  }
-
-  // ------- clock -------
-  setInterval(()=>{
-    if(!S||$('main').style.display==='none')return;
-    const s=Math.floor((Date.now()-S.start)/1000);
-    $('clock').textContent=[s/3600,s/60%60,s%60].map(x=>String(Math.floor(x)).padStart(2,'0')).join(':');
-  },1000);
-  setInterval(()=>{if(S&&$('main').style.display!=='none')update()},60000);
-
-  // ------- fin de turno -------
-  $('endBtn').onclick=()=>{
-    const p=S.crew.length,kg=totKg(),m=mallasEq(kg),r=pozoEffAt(kg,p),th=scaled(p);
-    const bags=S.counts.reduce((a,b)=>a+b,0);
-    $('sumBags').textContent=bags;
-    $('sumKg').textContent=fmt(kg)+' kg';
-    $('sumAvg').textContent=(p?bags/p:0).toFixed(1)+' mallas';
-    $('sumLevel').textContent=r.li<0?(r.pozo>0?'N1':'—'):(r.li===0?(r.pozo>0?'N1':'Base'):'N'+r.li);
-    const s=Math.floor((Date.now()-S.start)/1000);
-    $('sumTime').textContent=Math.floor(s/3600)+'h '+Math.floor(s/60%60)+'m';
-    $('sumPeople').textContent=p;
-    $('sumPozo').textContent=money(r.pozo);
-    $('sumPP').textContent=money(r.pozo/p*NET);
-    const below=m<th[0];
-    $('sumCard').className='sumCard'+(r.pozo>0?'':' zero');
-    $('sumSub').textContent=r.pozo>0
-      ?'¡Buen turno! Guarda para que quede en la reportería.'
-      :(below?'Día bajo la base — ojo: máximo '+MAX_BELOW+' al mes o se invalida el bono. 💪':'Hoy no hubo bono — mañana se remonta. 💪');
-    $('overlay').classList.add('show');
-  };
-  $('backBtn').onclick=()=>$('overlay').classList.remove('show');
-  $('saveBtn').onclick=()=>{
-    const p=S.crew.length,kg=totKg(),m=mallasEq(kg),r=pozoEffAt(kg,p),th=scaled(p);
-    const bags=S.counts.reduce((a,b)=>a+b,0);
-    const rec={
-      ts:S.start, month:monthKey(S.start), people:p, bags, kg, m:Math.round(m*10)/10,
-      level:r.li<0?(r.pozo>0?'N1':'—'):(r.li===0?(r.pozo>0?'N1':'Base'):'N'+r.li),
-      pozo:Math.round(r.pozo), ppLiq:Math.round(r.pozo/p*NET), below:m<th[0], crew:S.crew
-    };
-    history.push(rec);
-    saveHist();
-    fetch('/api/turnos',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(rec)}).catch(()=>{});
-    localStorage.removeItem('turnoState');S=null;lastMilestone=-1;
-    $('overlay').classList.remove('show');
-    $('main').style.display='none';$('setup').style.display='block';
-    selected=new Set();renderChips();updInv();renderSetupWarn();
-  };
-
-  // ------- reportería -------
-  async function fetchServer(){
-    try{const r=await fetch('/api/turnos',{cache:'no-store'});if(!r.ok)throw 0;const j=await r.json();return Array.isArray(j)?j:null}catch(e){return null}
-  }
-  function renderReport(list){
-    const src=list||history;
-    const mk=monthKey(Date.now());
-    const rows=src.filter(h=>h.month===mk);
-    $('repMes').textContent=MESES_L[hoy.getMonth()];
-    $('repMonthLab').textContent=MESES_L[hoy.getMonth()].toUpperCase()+' '+hoy.getFullYear();
-    const bags=rows.reduce((a,h)=>a+h.bags,0), kg=rows.reduce((a,h)=>a+h.kg,0);
-    const pozo=rows.reduce((a,h)=>a+h.pozo,0), pp=rows.reduce((a,h)=>a+h.ppLiq,0);
-    $('repBags').textContent=fmt(bags);
-    $('repShifts').textContent=rows.length+(rows.length===1?' turno registrado':' turnos registrados');
-    $('repKg').textContent=fmt(kg);
-    $('repPozo').textContent=money(pozo);
-    $('repPP').textContent='≈ '+money(pp)+' líquidos por persona en el mes';
-    $('repAvg').textContent=rows.length?fmt(bags/rows.length):0;
-    const below=rows.filter(h=>h.below).length;
-    const al=$('repAlert');
-    $('repBelow').textContent=below+' de '+MAX_BELOW;
-    if(below===0){al.className='rep alert ok';$('repBelowSub').textContent='Todo en regla: ningún día bajo la base este mes. Así se cuida el bono. ✅'}
-    else if(below<MAX_BELOW){al.className='rep alert warn';$('repBelowSub').textContent='Ojo: al llegar a '+MAX_BELOW+' días bajo la base se invalida el bono del mes completo. Quedan '+(MAX_BELOW-below)+'. ⚠️'}
-    else{al.className='rep alert bad';$('repBelowSub').textContent='Se alcanzó el tope de días bajo la base: el bono del mes queda en revisión según el anexo. ⛔'}
-    // historial
-    const hl=$('histList');hl.innerHTML='';
-    if(!rows.length){hl.innerHTML='<div style="color:var(--muted);font-size:13px;padding:10px 0">Aún no hay turnos guardados este mes. Al cerrar un turno con "Guardar", aparece aquí.</div>'}
-    rows.slice().reverse().forEach(h=>{
-      const d=new Date(h.ts);
-      const lvlCol=h.below?'var(--coral)':(h.pozo>0?'var(--lime)':'var(--muted2)');
-      hl.insertAdjacentHTML('beforeend',`
-        <div class="histRow${h.below?' below':''}">
-          <div class="d">${DIAS_S[d.getDay()]} ${d.getDate()}</div>
-          <div class="v">${fmt(h.bags)} mallas · ${fmt(h.kg)} kg · ${h.people} pers.</div>
-          <div class="lvl" style="border:1px solid ${lvlCol};color:${lvlCol}">${h.below?'BAJO BASE':h.level}</div>
-          <div class="pz">${money(h.pozo)}</div>
-        </div>`);
-    });
-  }
-  $('repBtn').onclick=async()=>{
-    renderReport();
-    $('setup').style.display='none';$('report').style.display='block';window.scrollTo(0,0);
-    const sv=await fetchServer();
-    if(sv){
-      const seen=new Set(sv.map(h=>h.ts));
-      const localOnly=history.filter(h=>!seen.has(h.ts));
-      localOnly.forEach(h=>fetch('/api/turnos',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(h)}).catch(()=>{}));
-      const merged=[...sv,...localOnly].sort((a,b)=>a.ts-b.ts);
-      renderReport(merged);
-    }
-  };
-  $('repBack').onclick=()=>{$('report').style.display='none';$('setup').style.display='block'};
-
-  // ------- init -------
-  renderChips();updInv();renderSetupWarn();
-  if(S&&S.start){showMain()}
+if(S&&S.start){
+  showMain();
+}
 })();
 </script>
 </body>
