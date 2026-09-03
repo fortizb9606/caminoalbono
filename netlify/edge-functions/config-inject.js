@@ -3,7 +3,7 @@ export default async (request, context) => {
   const type = response.headers.get('content-type') || '';
   if (!type.includes('text/html')) return response;
   let html = await response.text();
-  html = html.replace('<script>\n(function(){','<script src="/bonus-config.js"></script>\n<script src="/bonus-opening.js"></script>\n<script>\n(function(){');
+  html = html.replace('<script>\n(function(){','<script src="/bonus-config.js"></script>\n<script src="/bonus-opening.js"></script>\n<script src="/inventory-flow.js"></script>\n<script>\n(function(){');
   html = html.replace('const COST=37000, TARGET=70, KGBAG=15, NET=.76, REF=6, MAX_BELOW=3;\n  const TH=[190,220,260,300,360], SHARES=[1,.8,.7,.6];',`const BC=window.BONUS_CFG||{};\n  const COST=Number(BC.cost||37000), TARGET=Number(BC.target||70), KGBAG=Number(BC.eqKg||15), NET=Number(BC.net||.76), REF=6, MAX_BELOW=3;\n  const TH=(BC.thresholdKg&&BC.thresholdKg[6]?BC.thresholdKg[6].map(x=>Number(x)/KGBAG):[190,220,260,300,360]), SHARES=(Array.isArray(BC.shares)&&BC.shares.length===4?BC.shares:[.8,.75,.6,.6]);`);
   html = html.replace('function scaled(p){const f=p/REF;return TH.map(x=>Math.round(x*f))}',`function scaled(p){\n    const a=BC.thresholdKg&&BC.thresholdKg[p];\n    if(Array.isArray(a)&&a.length===5)return a.map(x=>Number(x)/KGBAG);\n    const f=p/REF;return TH.map(x=>Math.round(x*f))\n  }`);
   html = html.replace('function trigger(p){return Math.floor(p*COST/(TARGET*KGBAG))+1}','function trigger(p){return scaled(p)[1]}');
