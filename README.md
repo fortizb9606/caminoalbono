@@ -58,3 +58,5 @@ Desde ahí, **cada push a `main` publica solo**. Los datos de la reportería (Bl
 - Nombres part-time agregados quedan registrados en el dispositivo (`localStorage.ptNames`).
 - Máximo **3 días bajo la base** al mes o el bono mensual queda en revisión (contador en Reportería + aviso en portada).
 - Para resetear un turno pegado: cerrar con "Terminar → Guardar" o borrar `turnoState` en localStorage.
+
+<!-- deploy refresh -->
