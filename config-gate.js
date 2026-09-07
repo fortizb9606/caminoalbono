@@ -1,6 +1,7 @@
 (function(){
 'use strict';
 const AK='theIceConfigAccessV1';
+sessionStorage.removeItem(AK);
 function unlocked(){return !!sessionStorage.getItem(AK)}
 async function verify(pin){
   try{
@@ -9,6 +10,8 @@ async function verify(pin){
   }catch(e){return false}
 }
 document.addEventListener('click',async e=>{
+  const back=e.target&&e.target.closest?e.target.closest('#bcBack'):null;
+  if(back){sessionStorage.removeItem(AK);return}
   const b=e.target&&e.target.closest?e.target.closest('#bonusCfgBtn'):null;
   if(!b||unlocked())return;
   e.preventDefault();e.stopImmediatePropagation();
