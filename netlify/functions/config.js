@@ -19,7 +19,7 @@ export default async (req)=>{
   const s=store();
   if(req.method==='GET'){
     const data=await s.get('current',{type:'json'});
-    return Response.json(data||defaults,{headers:{'cache-control':'no-store'}});
+    return Response.json(data?{...data,initialized:true}:{...defaults,initialized:false},{headers:{'cache-control':'no-store'}});
   }
   if(req.method==='POST'){
     if(!authorized(req))return new Response('No autorizado',{status:403});
