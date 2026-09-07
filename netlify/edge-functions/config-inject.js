@@ -16,6 +16,11 @@ export default async (request, context) => {
   html = html.replace("'se activa cuando el kilo baje de $'+TARGET","'se activa al llegar a '+fmt(trigger(p))+' mallas equivalentes'");
   html = html.replace("S={start:Date.now(),crew:chosen.crew,crewByShift:chosen.byShift,inv:[+$('inv0').value||0,+$('inv1').value||0,+$('inv2').value||0],counts:[0,0,0]};","S={start:Date.now(),crew:chosen.crew,crewByShift:chosen.byShift,inv:Array(PRODUCTS.length).fill(0),counts:Array(PRODUCTS.length).fill(0)};");
   html = html.replace("$('invNow'+i).textContent=S.inv[i]+S.counts[i];","$('invNow'+i).textContent=(S.inv[i]||0)+S.counts[i];");
+  html = html.replace("$('metaBase').textContent=th[0];","$('metaBase').textContent=fmt(th[0]);");
+  html = html.replace("$('metaTrig').textContent=trigger(p);","$('metaTrig').textContent=fmt(trigger(p));");
+  html = html.replace('<b>${lab}</b>${v}</div>','<b>${lab}</b>${fmt(v)}</div>');
+  html = html.replace("'Desde la malla '+trig+' cada kilo","'Desde la malla '+fmt(trig)+' cada kilo");
+  html = html.replace("'se calcula con el pozo real del día — se activa al pasar la malla '+trig+'.';","'se calcula con el pozo real del día — se activa al pasar la malla '+fmt(trig)+'.';");
   const headers = new Headers(response.headers);headers.delete('content-length');headers.set('cache-control','no-store, max-age=0');
   return new Response(html,{status:response.status,statusText:response.statusText,headers});
 };
