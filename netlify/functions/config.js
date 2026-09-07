@@ -1,9 +1,12 @@
 import { getStore, getDeployStore } from '@netlify/blobs';
+import { createHash, timingSafeEqual } from 'node:crypto';
 
 const defaults={
   bonus:{cost:37000,target:72,eqKg:15,net:.72,shares:[.55,.50,.40,.30],scale:{3:1,4:1.02,5:1.04,6:1.06,7:1.08,8:1.10,9:1.12},thresholdKg:{3:[1500,1650,2265,2610,3120],4:[1995,2205,3015,3480,4185],5:[2505,2745,3750,4335,5205],6:[2850,3135,3900,4500,5400],7:[3330,3855,4545,5250,6300],8:[3795,4395,5205,6000,7200],9:[4275,4950,5850,6750,8100]}},
   products:[{id:'original15',name:'Pack 15 kg',tag:'Original',kg:15,bonus:true},{id:'original12',name:'Pack 12 kg',tag:'Original',kg:12,bonus:true},{id:'mini15',name:'Pack 15 kg',tag:'Mini',kg:15,bonus:true},{id:'saco20',name:'Saco 20 kg',tag:'Reserva',kg:20,bonus:false}]
 };
+
+const PIN_HASH='20f3765880a5c269b747e1e906054a4b4a3a991259f1e16b5dde4742cec2319a';
 
 function store(){
   return Netlify.env.get('CONTEXT')==='production'
@@ -11,8 +14,9 @@ function store(){
     : getDeployStore('camino-config');
 }
 function authorized(req){
-  const expected=Netlify.env.get('CONFIG_PIN');
-  return !!expected&&req.headers.get('x-config-pin')===expected;
+  const pin=String(req.headers.get('x-config-pin')||'');
+  const got=createHash('sha256').update(pin).digest('hex');
+  return timingSafeEqual(Buffer.from(got,'hex'),Buffer.from(PIN_HASH,'hex'));
 }
 
 export default async (req)=>{
