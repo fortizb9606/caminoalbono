@@ -1,6 +1,18 @@
 [build]
   publish = "."
 
+[[redirects]]
+  from = "/api/config"
+  to = "/.netlify/functions/config"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/turnos"
+  to = "/.netlify/functions/turnos"
+  status = 200
+  force = true
+
 [[edge_functions]]
   function = "config-inject"
   path = "/*"
