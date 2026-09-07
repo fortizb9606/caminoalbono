@@ -7,7 +7,8 @@ const pct=n=>Math.round((n||0)*100)+'%';
 function cfg(){ return window.BONUS_CFG||window.BONUS_CONFIG_DEFAULTS; }
 function raw(kg,p,c){
   const labor=p*c.cost;
-  const sav=Math.max(0,c.target*kg-labor);
+  const scale=c.scale&&c.scale[p]||1;
+  const sav=Math.max(0,c.target*scale*kg-labor);
   const th=c.thresholdKg[p];
   if(!th||kg<th[1]||sav<=0) return {sav,share:0,pozo:0,li:-1};
   let li=-1;
@@ -93,7 +94,8 @@ function render(open,p,seg){
       <td>${money(d.company)}</td>
     </tr>`;
   }).join('');
-  open.querySelector('.bo-summary').textContent=`${rows.length} puntos · ${fmt(from)} a ${fmt(to)} kg · paso ${fmt(step)} kg`;
+  const factor=Math.round((c.scale&&c.scale[p]||1)*100);
+  open.querySelector('.bo-summary').textContent=`${rows.length} puntos · ${fmt(from)} a ${fmt(to)} kg · paso ${fmt(step)} kg · factor ${factor}%`;
   open.querySelector('tbody').innerHTML=body;
 }
 function attach(card,p){
