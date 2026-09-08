@@ -8,10 +8,27 @@ const defaults={
 
 const PIN_HASH='20f3765880a5c269b747e1e906054a4b4a3a991259f1e16b5dde4742cec2319a';
 
-function store(){
-  return Netlify.env.get('CONTEXT')==='production'
+function isProduction(req){
+  const ctx=Netlify.context?.deploy?.context||Netlify.env.get('CONTEXT')||'';
+  if(ctx) return ctx==='production';
+  try{return new URL(req.url).hostname==='camino-al-bono-theice.netlify.app'}catch{return false}
+}
+function storeFor(req){
+  return isProduction(req)
     ? getStore('camino-config',{consistency:'strong'})
     : getDeployStore('camino-config');
+}
+async function readCurrent(req){
+  const primary=storeFor(req);
+  let data=await primary.get('current',{type:'json'});
+  if(isProduction(req)&&!data){
+    try{
+      const legacy=getDeployStore('camino-config');
+      const old=await legacy.get('current',{type:'json'});
+      if(old){await primary.setJSON('current',old);data=old}
+    }catch(e){}
+  }
+  return {primary,data};
 }
 function authorized(req){
   const pin=String(req.headers.get('x-config-pin')||'');
@@ -20,9 +37,8 @@ function authorized(req){
 }
 
 export default async (req)=>{
-  const s=store();
   if(req.method==='GET'){
-    const data=await s.get('current',{type:'json'});
+    const {data}=await readCurrent(req);
     return Response.json(data?{...data,initialized:true}:{...defaults,initialized:false},{headers:{'cache-control':'no-store'}});
   }
   if(req.method==='POST'){
@@ -31,8 +47,9 @@ export default async (req)=>{
     if(url.searchParams.get('verify')==='1')return Response.json({ok:true});
     let body;try{body=await req.json()}catch{return new Response('JSON inválido',{status:400})}
     if(!body||!body.bonus||!Array.isArray(body.products))return new Response('Configuración inválida',{status:400});
+    const primary=storeFor(req);
     const data={bonus:body.bonus,products:body.products,updatedAt:Date.now()};
-    await s.setJSON('current',data);
+    await primary.setJSON('current',data);
     return Response.json({ok:true,updatedAt:data.updatedAt});
   }
   return new Response('Method not allowed',{status:405});
