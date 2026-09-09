@@ -3,6 +3,10 @@
 const BK='theIceBonusConfigV3',PK='theIceProductsV1',SK='theIceCentralConfigSeenV1';
 function same(a,b){try{return JSON.stringify(a)===JSON.stringify(b)}catch{return false}}
 function clone(o){return JSON.parse(JSON.stringify(o))}
+function migrateOldBonus(c){
+  if(c&&Number(c.target)===72&&Math.abs(Number(c.net)-.72)<.0001){c={...c,target:70,net:.76}}
+  return c;
+}
 function readBonusFromForm(){
   const c=clone(window.BONUS_CFG||JSON.parse(localStorage.getItem(BK)||'{}'));
   const g=id=>document.getElementById(id);
@@ -37,6 +41,7 @@ function validBonus(c){
 async function pull(autoReload=false){try{
   const r=await fetch('/api/config',{cache:'no-store'});if(!r.ok)return false;
   const c=await r.json();if(c.initialized===false)return false;
+  if(c.bonus)c.bonus=migrateOldBonus(c.bonus);
   let oldBonus=null,oldProducts=null;
   try{oldBonus=JSON.parse(localStorage.getItem(BK)||'null')}catch(e){}
   try{oldProducts=JSON.parse(localStorage.getItem(PK)||'null')}catch(e){}
@@ -51,13 +56,16 @@ async function pull(autoReload=false){try{
   return true;
 }catch(e){return false}}
 async function push(bonus,products){try{
-  bonus=bonus||JSON.parse(localStorage.getItem(BK)||'null')||window.BONUS_CFG;
+  bonus=migrateOldBonus(bonus||JSON.parse(localStorage.getItem(BK)||'null')||window.BONUS_CFG);
   products=products||JSON.parse(localStorage.getItem(PK)||'null')||window.THE_ICE_PRODUCTS||[];
   const pin=window.THE_ICE_CONFIG_PIN?window.THE_ICE_CONFIG_PIN():'';
   if(!bonus||!products.length||!pin)return false;
   const r=await fetch('/api/config',{method:'POST',headers:{'content-type':'application/json','x-config-pin':pin},body:JSON.stringify({bonus,products}),cache:'no-store'});
   if(!r.ok)return false;
-  try{const out=await r.json();if(out.updatedAt)sessionStorage.setItem(SK,String(out.updatedAt))}catch(e){}
+  let out=null;try{out=await r.json();if(out.updatedAt)sessionStorage.setItem(SK,String(out.updatedAt))}catch(e){}
+  const check=await fetch('/api/config',{cache:'no-store'});if(!check.ok)return false;
+  const saved=await check.json();
+  if(!saved.bonus||!same(migrateOldBonus(saved.bonus),bonus))return false;
   return true;
 }catch(e){return false}}
 window.THE_ICE_PULL_CONFIG=pull;window.THE_ICE_PUSH_CONFIG=push;
@@ -66,14 +74,14 @@ function mountSave(){
   btn.dataset.centralStrong='1';
   btn.addEventListener('click',async e=>{
     e.preventDefault();e.stopImmediatePropagation();
-    const bonus=readBonusFromForm();
+    const bonus=migrateOldBonus(readBonusFromForm());
     const bad=validBonus(bonus);if(bad){alert(`Revisa ${bad} personas: cada nivel debe ser mayor al anterior.`);return}
     const products=readProductsFromForm();
     localStorage.setItem(BK,JSON.stringify(bonus));window.BONUS_CFG=bonus;
     if(window.THE_ICE_SAVE_PRODUCTS)window.THE_ICE_SAVE_PRODUCTS(products);else{localStorage.setItem(PK,JSON.stringify(products));window.THE_ICE_PRODUCTS=products}
     const old=btn.textContent;btn.disabled=true;btn.textContent='Guardando en servidor…';
     const ok=await push(bonus,products);
-    if(!ok){btn.disabled=false;btn.textContent=old;alert('No se pudo guardar la configuración central. No se recargó la página para evitar perder cambios.');return}
+    if(!ok){btn.disabled=false;btn.textContent=old;alert('No se pudo confirmar la configuración central. No se recargó la página para evitar perder cambios.');return}
     btn.textContent='Guardado ✓';
     setTimeout(()=>location.reload(),250);
   },true);
