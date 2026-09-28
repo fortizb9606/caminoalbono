@@ -206,6 +206,13 @@ h1.mega .lime{color:var(--lime)}
 .personShift{display:grid;grid-template-columns:1fr auto;gap:5px 12px;padding:8px 0;border-top:1px solid var(--line);font-size:11px;color:var(--muted2)}
 .personShift:first-of-type{border-top:0}.personShift b{color:var(--text);font-family:Oswald}.personShift small{grid-column:1/-1;color:var(--muted)}
 .adminEmpty{border:1px dashed var(--line2);border-radius:16px;padding:24px;color:var(--muted2);text-align:center;line-height:1.5}
+.adminLogin{text-align:left;max-width:460px}
+.adminLogin label{display:block;font-family:Oswald;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted2);margin:20px 0 8px}
+.adminKeyRow{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:stretch}
+.adminKeyRow input{min-width:0;min-height:52px;background:var(--input);border:1px solid var(--line2);border-radius:12px;color:var(--text);padding:12px 14px;font:600 16px Archivo}
+.adminKeyRow .editBtn{padding:8px 14px}
+.adminLoginActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.adminLoginActions .startBtn,.adminLoginActions .ghostBtn{margin-top:0;min-height:52px;padding:14px;letter-spacing:.12em}
 .disc{text-align:center;font-size:11px;color:#4d5a55;margin:18px 4px 0;line-height:1.5}
 .confetti{position:fixed;top:-20px;font-size:22px;z-index:99;pointer-events:none;animation:fall linear forwards}
 @keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.3}}
@@ -225,6 +232,7 @@ h1.mega .lime{color:var(--lime)}
   .turnDetailGrid{grid-template-columns:1fr}
   .adminPeople{grid-template-columns:1fr}
   .adminToolbar{align-items:stretch;flex-direction:column}.adminSelect{width:100%}
+  .adminLoginActions{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -384,6 +392,23 @@ h1.mega .lime{color:var(--lime)}
     <button class="ghostBtn" id="adminReportBtn">Ver reportería y administrar días</button>
     <button class="ghostBtn" id="adminBack">← Cerrar administración</button>
     <p class="disc">Vista privada · los montos son referenciales hasta la validación del cierre formal.</p>
+  </div>
+
+  <div class="overlay" id="adminLoginOverlay" role="dialog" aria-modal="true" aria-labelledby="adminLoginTitle">
+    <form class="sumCard adminLogin" id="adminLoginForm">
+      <h2 id="adminLoginTitle">Acceso administración</h2>
+      <p class="sumSub">Ingresa la clave privada para consultar los bonos y administrar los días guardados.</p>
+      <label for="adminKeyInput">Clave de administración</label>
+      <div class="adminKeyRow">
+        <input id="adminKeyInput" type="password" autocomplete="current-password" spellcheck="false" required>
+        <button class="editBtn" type="button" id="toggleAdminKey" aria-pressed="false">Mostrar</button>
+      </div>
+      <p class="saveStatus" id="adminLoginStatus" role="alert" aria-live="polite"></p>
+      <div class="adminLoginActions">
+        <button class="startBtn" type="submit" id="adminLoginSubmit">Entrar</button>
+        <button class="ghostBtn" type="button" id="adminLoginCancel">Cancelar</button>
+      </div>
+    </form>
   </div>
 
   <!-- ============ SUMMARY ============ -->
@@ -1034,15 +1059,35 @@ h1.mega .lime{color:var(--lime)}
       return '<article class="personCard"><div class="personHead"><div class="personName">'+esc(p.name)+'</div><div class="personBonus">'+money(p.bonus)+'</div></div><div class="personStats"><span>'+p.shifts+(p.shifts===1?' turno':' turnos')+'</span><span>'+p.bonusShifts+' con bono</span></div><details class="personDetail"><summary>Ver detalle por fecha</summary>'+details+'</details></article>';
     }).join('');
   }
-  $('adminBtn').onclick=async()=>{
-    const key=prompt('Ingresa la clave de administración:');
-    if(!key||!key.trim())return;
-    const btn=$('adminBtn'),original=btn.textContent;btn.disabled=true;btn.textContent='Comprobando clave…';
-    const serverRows=await fetchServer(key.trim());
-    btn.disabled=false;btn.textContent=original;
-    if(serverRows===null){alert('La clave no es correcta o el respaldo central no está disponible.');return}
-    adminSessionKey=key.trim();
+  function closeAdminLogin(){
+    $('adminLoginOverlay').classList.remove('show');
+    $('adminKeyInput').value='';$('adminKeyInput').type='password';
+    $('toggleAdminKey').textContent='Mostrar';$('toggleAdminKey').setAttribute('aria-pressed','false');
+    $('adminLoginStatus').textContent='';$('adminLoginStatus').className='saveStatus';
+  }
+  $('adminBtn').onclick=()=>{
+    $('adminLoginOverlay').classList.add('show');
+    setTimeout(()=>$('adminKeyInput').focus(),50);
+  };
+  $('adminLoginCancel').onclick=()=>{closeAdminLogin();$('adminBtn').focus()};
+  $('toggleAdminKey').onclick=()=>{
+    const show=$('adminKeyInput').type==='password';
+    $('adminKeyInput').type=show?'text':'password';
+    $('toggleAdminKey').textContent=show?'Ocultar':'Mostrar';
+    $('toggleAdminKey').setAttribute('aria-pressed',show?'true':'false');
+    $('adminKeyInput').focus();
+  };
+  $('adminLoginForm').onsubmit=async e=>{
+    e.preventDefault();
+    const key=$('adminKeyInput').value.trim();if(!key){$('adminLoginStatus').textContent='Ingresa la clave para continuar.';$('adminLoginStatus').className='saveStatus bad';return}
+    const btn=$('adminLoginSubmit');btn.disabled=true;btn.textContent='Comprobando…';
+    $('adminLoginStatus').textContent='Consultando el respaldo central…';$('adminLoginStatus').className='saveStatus';
+    const serverRows=await fetchServer(key);
+    btn.disabled=false;btn.textContent='Entrar';
+    if(serverRows===null){$('adminLoginStatus').textContent='Clave incorrecta o respaldo no disponible. Revisa la clave e inténtalo nuevamente.';$('adminLoginStatus').className='saveStatus bad';$('adminKeyInput').focus();$('adminKeyInput').select();return}
+    adminSessionKey=key;
     adminRecords=visibleRecords(serverRows).sort((a,b)=>a.ts-b.ts);
+    closeAdminLogin();
     setupAdminMonths();renderAdmin();
     $('setup').style.display='none';$('report').style.display='none';$('admin').style.display='block';window.scrollTo(0,0);
   };
