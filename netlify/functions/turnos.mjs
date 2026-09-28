@@ -1,54 +1,35 @@
-import { getStore, getDeployStore } from '@netlify/blobs';
+import { getStore } from '@netlify/blobs';
+import { createHash, timingSafeEqual } from 'node:crypto';
 
-function isProduction(req){
-  const ctx=Netlify.context?.deploy?.context||Netlify.env.get('CONTEXT')||'';
-  if(ctx)return ctx==='production';
-  try{return new URL(req.url).hostname==='camino-al-bono-theice.netlify.app'}catch{return false}
+function store(){return getStore('camino-turnos',{consistency:'strong'})}
+const KEY_HASH='b94014e34122d1a2fe1c4bfc6dc3be078d3e4546bcdf0d5b95b2f5390c1a62ba';
+function authorized(req){
+  const key=String(req.headers.get('x-turno-key')||'');
+  const got=createHash('sha256').update(key).digest();
+  const expected=Buffer.from(KEY_HASH,'hex');
+  return got.length===expected.length&&timingSafeEqual(got,expected);
 }
-function storeFor(req){
-  return isProduction(req)
-    ? getStore('camino-turnos',{consistency:'strong'})
-    : getDeployStore('camino-turnos');
-}
-async function migrateCurrentDeploy(req,primary){
-  if(!isProduction(req))return;
-  try{
-    const legacy=getDeployStore('camino-turnos');
-    const {blobs}=await legacy.list();
-    for(const b of blobs){
-      const exists=await primary.get(b.key,{type:'json'});
-      if(exists)continue;
-      const row=await legacy.get(b.key,{type:'json'});
-      if(row)await primary.setJSON(b.key,row);
-    }
-  }catch(e){}
-}
-async function rowsFrom(store){
-  const {blobs}=await store.list();
+
+async function rowsFrom(s){
+  const {blobs}=await s.list();
   const rows=[];
-  for(const b of blobs){
-    const r=await store.get(b.key,{type:'json'});
-    if(r)rows.push(r);
-  }
+  for(const b of blobs){const row=await s.get(b.key,{type:'json'});if(row)rows.push(row)}
   rows.sort((a,b)=>(a.ts||0)-(b.ts||0));
   return rows;
 }
 
 export default async (req)=>{
-  const s=storeFor(req);
+  if(!authorized(req))return new Response('No autorizado',{status:403});
+  const s=store();
   const url=new URL(req.url);
-  if(req.method==='GET'){
-    await migrateCurrentDeploy(req,s);
-    return Response.json(await rowsFrom(s),{headers:{'cache-control':'no-store'}});
-  }
+  if(req.method==='GET')return Response.json(await rowsFrom(s),{headers:{'cache-control':'no-store'}});
   if(req.method==='POST'){
     let body;try{body=await req.json()}catch{return new Response('JSON inválido',{status:400})}
     if(!body||!body.ts)return new Response('Turno inválido',{status:400});
-    const key=String(body.ts);
-    const existing=await s.get(key,{type:'json'});
-    const merged=existing?{...existing,...body,finalInventory:body.finalInventory||existing.finalInventory}:body;
+    const key=String(body.ts),existing=await s.get(key,{type:'json'});
+    const merged=existing?{...existing,...body}:body;
     await s.setJSON(key,merged);
-    return Response.json({ok:true,ts:body.ts});
+    return Response.json({ok:true,ts:body.ts,recordVersion:merged.recordVersion||1});
   }
   if(req.method==='DELETE'){
     const ts=url.searchParams.get('ts');

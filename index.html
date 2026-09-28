@@ -248,6 +248,7 @@ h1.mega .lime{color:var(--lime)}
 
     <button class="startBtn" id="startBtn" disabled>Iniciar turno</button>
     <button class="ghostBtn" id="repBtn">Reportería del mes</button>
+    <button class="ghostBtn" id="connectSyncBtn">Conectar respaldo central</button>
     <div class="warnLine" id="setupWarn"></div>
     <div class="syncNotice" id="syncNotice" aria-live="polite"></div>
   </div>
@@ -416,6 +417,9 @@ h1.mega .lime{color:var(--lime)}
   try{const q=JSON.parse(localStorage.getItem('turnoPendingDeletesV1')||'[]');if(Array.isArray(q))pendingDeletes=q.map(String)}catch(e){}
   let deviceId=localStorage.getItem('turnoDeviceId');
   if(!deviceId){deviceId='ipad-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);localStorage.setItem('turnoDeviceId',deviceId)}
+  const SYNC_KEY_STORE='turnoSyncKeyV1';
+  const syncKey=()=>localStorage.getItem(SYNC_KEY_STORE)||'';
+  const syncHeaders=()=>({'content-type':'application/json','x-turno-key':syncKey()});
   let deletedDays=new Set();
   try{const d=JSON.parse(localStorage.getItem('deletedTurnoDays')||'[]');if(Array.isArray(d))deletedDays=new Set(d.map(String))}catch(e){}
   let selected=new Set();
@@ -788,15 +792,17 @@ h1.mega .lime{color:var(--lime)}
   function showSyncNotice(text,kind){const el=$('syncNotice');if(!text){el.className='syncNotice';el.textContent='';return}el.textContent=text;el.className='syncNotice show '+(kind||'')}
   function queueRecord(rec){pendingSync=pendingSync.filter(x=>String(x.ts)!==String(rec.ts));pendingSync.push(rec);savePending()}
   async function postRecord(rec){
-    try{const r=await fetch('/api/turnos',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(rec),keepalive:true});return r.ok}catch(e){return false}
+    if(!syncKey())return false;
+    try{const r=await fetch('/api/turnos',{method:'POST',headers:syncHeaders(),body:JSON.stringify(rec),keepalive:true});return r.ok}catch(e){return false}
   }
   async function syncPending(){
+    if(!syncKey()){showSyncNotice('El turno está seguro en este iPad. Pulsa “Conectar respaldo central” e ingresa la clave para sincronizarlo.','warn');return false}
     if(navigator.onLine===false)return false;
     let changed=false,remaining=[];
     for(const rec of pendingSync){if(await postRecord(rec)){changed=true}else remaining.push(rec)}
     pendingSync=remaining;
     const deleteRemaining=[];
-    for(const ts of pendingDeletes){try{const r=await fetch('/api/turnos?ts='+encodeURIComponent(ts),{method:'DELETE',keepalive:true});if(r.ok){changed=true}else deleteRemaining.push(ts)}catch(e){deleteRemaining.push(ts)}}
+    for(const ts of pendingDeletes){try{const r=await fetch('/api/turnos?ts='+encodeURIComponent(ts),{method:'DELETE',headers:{'x-turno-key':syncKey()},keepalive:true});if(r.ok){changed=true}else deleteRemaining.push(ts)}catch(e){deleteRemaining.push(ts)}}
     pendingDeletes=deleteRemaining;savePending();
     if(pendingSync.length||pendingDeletes.length)showSyncNotice('Guardado en este iPad. Hay '+(pendingSync.length+pendingDeletes.length)+' cambio(s) esperando conexión con el respaldo central.','warn');
     else if(changed)showSyncNotice('Respaldo central actualizado correctamente.','ok');
@@ -850,12 +856,13 @@ h1.mega .lime{color:var(--lime)}
 
   // ------- reportería -------
   async function fetchServer(){
-    try{const r=await fetch('/api/turnos',{cache:'no-store'});if(!r.ok)throw 0;const j=await r.json();return Array.isArray(j)?j:null}catch(e){return null}
+    if(!syncKey())return null;
+    try{const r=await fetch('/api/turnos',{cache:'no-store',headers:{'x-turno-key':syncKey()}});if(!r.ok)throw 0;const j=await r.json();return Array.isArray(j)?j:null}catch(e){return null}
   }
   let reportSource=null;
   const visibleRecords=list=>(list||[]).filter(h=>!deletedDays.has(String(h.ts)));
   async function requestServerDelete(ts){
-    try{const r=await fetch('/api/turnos?ts='+encodeURIComponent(ts),{method:'DELETE',keepalive:true});if(r.ok)return true}catch(e){}
+    try{const r=await fetch('/api/turnos?ts='+encodeURIComponent(ts),{method:'DELETE',headers:{'x-turno-key':syncKey()},keepalive:true});if(r.ok)return true}catch(e){}
     if(!pendingDeletes.includes(String(ts)))pendingDeletes.push(String(ts));savePending();return false;
   }
   function removeRecords(records){
@@ -927,6 +934,16 @@ h1.mega .lime{color:var(--lime)}
       renderReport(merged);
     }
   };
+  $('connectSyncBtn').onclick=async()=>{
+    const key=prompt('Ingresa la clave del respaldo central:');
+    if(!key||!key.trim())return;
+    localStorage.setItem(SYNC_KEY_STORE,key.trim());
+    showSyncNotice('Comprobando la clave y sincronizando…','');
+    try{const probe=await fetch('/api/turnos',{cache:'no-store',headers:{'x-turno-key':syncKey()}});if(!probe.ok)throw 0}catch(e){localStorage.removeItem(SYNC_KEY_STORE);showSyncNotice('La clave no es correcta o el respaldo no está disponible. Inténtalo otra vez.','warn');return}
+    const ok=await syncPending();
+    if(ok){$('connectSyncBtn').textContent='Respaldo central conectado';showSyncNotice('Respaldo central conectado correctamente.','ok')}
+    else{showSyncNotice('No se pudo conectar. Revisa la clave o la conexión e inténtalo otra vez.','warn')}
+  };
   $('repBack').onclick=()=>{$('report').style.display='none';$('setup').style.display='block'};
   $('deleteMonthBtn').onclick=()=>{
     const mk=monthKey(Date.now());
@@ -942,6 +959,7 @@ h1.mega .lime{color:var(--lime)}
 
   // ------- init -------
   renderInitialInventory();renderChips();renderSetupWarn();
+  if(syncKey())$('connectSyncBtn').textContent='Respaldo central conectado';
   window.THE_ICE_SYNC_TURNOS=syncPending;
   window.addEventListener('online',syncPending);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncPending()});
