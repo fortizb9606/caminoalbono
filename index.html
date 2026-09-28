@@ -152,6 +152,20 @@ h1.mega .lime{color:var(--lime)}
 .sumGrid div{background:var(--input);border:1px solid var(--line);border-radius:12px;padding:14px}
 .sumGrid span{display:block;font-family:Oswald;font-size:9px;color:var(--muted);font-weight:600;letter-spacing:.2em;text-transform:uppercase;margin-bottom:3px}
 .sumGrid b{font-family:Oswald;font-size:22px;font-weight:600}
+.closeInv{margin:4px 0 18px;text-align:left;border-top:1px solid var(--line);padding-top:18px}
+.closeInvTitle{margin:0;font-family:Oswald;font-size:13px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--lime)}
+.closeInvSub{margin:5px 0 12px;color:var(--muted2);font-size:12px;line-height:1.45}
+.closeInvGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.closeInvBox{background:var(--input);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+.closeInvBox label{display:block;font-family:Oswald;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.closeInvBox small{display:block;color:var(--muted);font-size:10px;margin-bottom:8px}
+.closeInvBox input{width:100%;background:var(--card2);border:1px solid var(--line2);border-radius:10px;color:var(--text);padding:12px;text-align:center;font:600 24px Oswald}
+.closeInvTotal{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:10px;color:var(--muted);font-size:11px}
+.closeInvTotal b{font-family:Oswald;font-size:16px;color:var(--agua)}
+.saveStatus{min-height:19px;margin:10px 0 0;color:var(--muted2);font-size:12px;line-height:1.45}
+.saveStatus.ok{color:var(--agua)}.saveStatus.warn{color:var(--amarillo)}.saveStatus.bad{color:var(--coral)}
+.syncNotice{display:none;margin:12px 0 0;border:1px solid var(--line2);border-radius:12px;padding:11px 13px;color:var(--muted2);font-size:12px;line-height:1.4}
+.syncNotice.show{display:block}.syncNotice.ok{border-color:#38534b;color:var(--agua)}.syncNotice.warn{border-color:#6b571e;color:var(--amarillo)}
 /* ---- reporte ---- */
 .repGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px}
 .rep{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
@@ -173,6 +187,7 @@ h1.mega .lime{color:var(--lime)}
 .histRow .pz{font-family:Oswald;font-size:14px;font-weight:600;color:var(--lime);min-width:76px;text-align:right}
 .histRow.below .d{color:var(--coral)}
 .deleteDay{min-width:44px;min-height:44px;border:1px solid #5c2a1e;background:transparent;color:var(--coral);border-radius:12px;cursor:pointer;font-size:17px}
+.turnDetail{border-bottom:1px solid var(--line);padding:0 4px 12px}.turnDetail summary{cursor:pointer;color:var(--agua);font:600 11px Oswald;letter-spacing:.1em;text-transform:uppercase;padding:7px 0}.turnDetailGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}.turnDetailCol{background:var(--input);border:1px solid var(--line);border-radius:11px;padding:10px}.turnDetailCol>b{display:block;font:600 11px Oswald;color:var(--lime);letter-spacing:.09em;text-transform:uppercase;margin-bottom:7px}.turnDetailItem{display:flex;justify-content:space-between;gap:8px;color:var(--muted2);font-size:10px;padding:3px 0}.turnDetailItem strong{color:var(--text);font-family:Oswald}.turnDetailTotal{border-top:1px solid var(--line);margin-top:5px;padding-top:6px;color:var(--agua)}
 .historyActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .dangerBtn{border-color:#5c2a1e;color:var(--coral);margin-top:0}
 .dangerBtn.strong{background:#241614}
@@ -188,9 +203,11 @@ h1.mega .lime{color:var(--lime)}
   .totalRow .big{font-size:56px}
   .crewLab{display:none}
   .sumGrid{grid-template-columns:1fr 1fr}
+  .closeInvGrid{grid-template-columns:1fr 1fr}
   .histRow{display:grid;grid-template-columns:1fr auto auto;align-items:center}
   .histRow .v{grid-column:1/-1;grid-row:2}.histRow .pz{grid-column:2;grid-row:1}.histRow .deleteDay{grid-column:3;grid-row:1/3}
   .historyActions{grid-template-columns:1fr}
+  .turnDetailGrid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -225,17 +242,14 @@ h1.mega .lime{color:var(--lime)}
     <div class="card">
       <p class="sec">02 · Inventario al iniciar</p>
       <p class="secSub">Mallas en bodega por producto. Los kilos se calculan solos.</p>
-      <div class="invGrid">
-        <div class="invBox"><h4>Pack 15 kg</h4><div class="tag">Original · 15 kg por malla</div><input id="inv0" type="number" min="0" value="0" inputmode="numeric" aria-label="Inventario inicial Pack 15 kg Original"><div class="kgLab"><b id="kg0">0</b>kg en bodega</div></div>
-        <div class="invBox"><h4>Pack 12 kg</h4><div class="tag">Original · 12 kg por malla</div><input id="inv1" type="number" min="0" value="0" inputmode="numeric" aria-label="Inventario inicial Pack 12 kg Original"><div class="kgLab"><b id="kg1">0</b>kg en bodega</div></div>
-        <div class="invBox"><h4>Pack 15 kg</h4><div class="tag">Mini · 15 kg por malla</div><input id="inv2" type="number" min="0" value="0" inputmode="numeric" aria-label="Inventario inicial Pack 15 kg Mini"><div class="kgLab"><b id="kg2">0</b>kg en bodega</div></div>
-      </div>
+      <div class="invGrid" id="initialInvGrid"></div>
       <div class="totalInv"><span class="lab">Total inventario</span><b id="totInvM">0</b><span>mallas</span><b id="totInvK">0</b><span>kg</span></div>
     </div>
 
     <button class="startBtn" id="startBtn" disabled>Iniciar turno</button>
     <button class="ghostBtn" id="repBtn">Reportería del mes</button>
     <div class="warnLine" id="setupWarn"></div>
+    <div class="syncNotice" id="syncNotice" aria-live="polite"></div>
   </div>
 
   <!-- ============ MAIN ============ -->
@@ -336,8 +350,15 @@ h1.mega .lime{color:var(--lime)}
         <div><span>Pozo del día</span><b id="sumPozo" style="color:var(--lime)">$0</b></div>
         <div><span>Por persona (líq.)</span><b id="sumPP" style="color:var(--lime)">$0</b></div>
       </div>
+      <div class="closeInv">
+        <p class="closeInvTitle">Inventario final del turno</p>
+        <p class="closeInvSub">Cuenta lo que queda físicamente en bodega. Completa todos los productos antes de guardar.</p>
+        <div class="closeInvGrid" id="finalInvGrid"></div>
+        <div class="closeInvTotal"><span>Total informado</span><b id="finalInvTotal">0 unidades · 0 kg</b></div>
+      </div>
       <button class="startBtn" id="saveBtn" style="margin-top:0">Guardar y cerrar turno</button>
       <button class="ghostBtn" id="backBtn">Volver al turno</button>
+      <p class="saveStatus" id="saveStatus" aria-live="polite"></p>
       <p class="disc" style="margin-top:14px">Cifras referenciales · el cierre oficial lo valida administración con el inventario.</p>
     </div>
   </div>
@@ -371,6 +392,11 @@ h1.mega .lime{color:var(--lime)}
   const hoy=new Date();
   $('dateLab').textContent=DIAS[hoy.getDay()]+', '+hoy.getDate()+' '+MESES[hoy.getMonth()];
   const monthKey=d=>{const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')};
+  const productKey=(p,i)=>p.id||('producto-'+i+'-'+String(p.name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-'));
+  const stockProducts=()=>{
+    const all=Array.isArray(window.THE_ICE_PRODUCTS)&&window.THE_ICE_PRODUCTS.length?window.THE_ICE_PRODUCTS:PRODUCTS;
+    return all.map((p,i)=>({id:productKey(p,i),name:p.name,tag:p.tag||'',kg:Number(p.kg)||0,bonus:p.bonus!==false}));
+  };
 
   // ------- estado -------
   let S=null;
@@ -384,6 +410,12 @@ h1.mega .lime{color:var(--lime)}
   function persistNames(){localStorage.setItem('shiftRostersV2',JSON.stringify(rosters))}
   let history=[];
   try{const h=JSON.parse(localStorage.getItem('turnoHistory')||'null'); if(Array.isArray(h)) history=h;}catch(e){}
+  let pendingSync=[];
+  try{const q=JSON.parse(localStorage.getItem('turnoPendingSyncV1')||'[]');if(Array.isArray(q))pendingSync=q}catch(e){}
+  let pendingDeletes=[];
+  try{const q=JSON.parse(localStorage.getItem('turnoPendingDeletesV1')||'[]');if(Array.isArray(q))pendingDeletes=q.map(String)}catch(e){}
+  let deviceId=localStorage.getItem('turnoDeviceId');
+  if(!deviceId){deviceId='ipad-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);localStorage.setItem('turnoDeviceId',deviceId)}
   let deletedDays=new Set();
   try{const d=JSON.parse(localStorage.getItem('deletedTurnoDays')||'[]');if(Array.isArray(d))deletedDays=new Set(d.map(String))}catch(e){}
   let selected=new Set();
@@ -392,6 +424,12 @@ h1.mega .lime{color:var(--lime)}
   function save(){localStorage.setItem('turnoState',JSON.stringify(S))}
   function saveHist(){localStorage.setItem('turnoHistory',JSON.stringify(history))}
   function saveDeleted(){localStorage.setItem('deletedTurnoDays',JSON.stringify([...deletedDays]))}
+  function savePending(){localStorage.setItem('turnoPendingSyncV1',JSON.stringify(pendingSync));localStorage.setItem('turnoPendingDeletesV1',JSON.stringify(pendingDeletes))}
+  function inventorySnapshot(ps,counts,capturedAt){
+    const items=ps.map((p,i)=>{const units=Math.max(0,Math.floor(Number(counts[i])||0));return{id:productKey(p,i),name:p.name,tag:p.tag||'',kgPerUnit:Number(p.kg)||0,bonus:p.bonus!==false,units,kg:units*(Number(p.kg)||0)}});
+    return{capturedAt:capturedAt||Date.now(),items,totalUnits:items.reduce((a,x)=>a+x.units,0),totalKg:items.reduce((a,x)=>a+x.kg,0)};
+  }
+  function shiftName(ts){const d=new Date(ts),mins=d.getHours()*60+d.getMinutes();if(mins>=420&&mins<960)return'AM';if(mins>=960&&mins<1320)return'Extensión';return'PM'}
   const personId=(group,name)=>group+'::'+name;
   function selectedCrew(){
     const crew=[],byShift={am:[],extension:[],pm:[]};
@@ -441,16 +479,21 @@ h1.mega .lime{color:var(--lime)}
   }
 
   // ------- inventario setup -------
+  function renderInitialInventory(){
+    const box=$('initialInvGrid'),ps=stockProducts();box.innerHTML='';
+    ps.forEach((pr,i)=>box.insertAdjacentHTML('beforeend','<div class="invBox"><h4>'+pr.name+'</h4><div class="tag">'+(pr.tag||'Producto')+' · '+fmt(pr.kg)+' kg por unidad'+(pr.bonus?'':' · sólo inventario')+'</div><input id="inv'+i+'" type="number" min="0" value="0" inputmode="numeric" aria-label="Inventario inicial '+pr.name+' '+(pr.tag||'')+'"><div class="kgLab"><b id="kg'+i+'">0</b>kg en bodega</div></div>'));
+    ps.forEach((_,i)=>$('inv'+i).addEventListener('input',updInv));
+    updInv();
+  }
   function updInv(){
     let tm=0,tk=0;
-    PRODUCTS.forEach((pr,i)=>{
+    stockProducts().forEach((pr,i)=>{
       const v=+$('inv'+i).value||0;
       $('kg'+i).textContent=fmt(v*pr.kg);
       tm+=v;tk+=v*pr.kg;
     });
     $('totInvM').textContent=fmt(tm);$('totInvK').textContent=fmt(tk);
   }
-  [0,1,2].forEach(i=>$('inv'+i).addEventListener('input',updInv));
 
   // ------- setup screen -------
   function chipEl(n,group){
@@ -512,7 +555,10 @@ h1.mega .lime{color:var(--lime)}
   }
   $('startBtn').onclick=()=>{
     const chosen=selectedCrew();
-    S={start:Date.now(),crew:chosen.crew,crewByShift:chosen.byShift,inv:[+$('inv0').value||0,+$('inv1').value||0,+$('inv2').value||0],counts:[0,0,0]};
+    const ps=stockProducts(),initialCounts=ps.map((_,i)=>Math.max(0,Math.floor(+$('inv'+i).value||0)));
+    const initialInventory=inventorySnapshot(ps,initialCounts);
+    const initialById={};initialInventory.items.forEach(x=>initialById[x.id]=x.units);
+    S={start:Date.now(),crew:chosen.crew,crewByShift:chosen.byShift,inv:PRODUCTS.map((p,i)=>initialById[productKey(p,i)]||0),counts:PRODUCTS.map(()=>0),initialInventory};
     lastMilestone=-1;save();showMain();
   };
 
@@ -723,6 +769,39 @@ h1.mega .lime{color:var(--lime)}
   setInterval(()=>{if(S&&$('main').style.display!=='none')update()},60000);
 
   // ------- fin de turno -------
+  function renderFinalInventory(){
+    const ps=stockProducts(),box=$('finalInvGrid');box.innerHTML='';
+    ps.forEach((p,i)=>box.insertAdjacentHTML('beforeend','<div class="closeInvBox"><label for="finalInv'+i+'">'+p.name+'</label><small>'+(p.tag||'Producto')+' · '+fmt(p.kg)+' kg'+(p.bonus?'':' · reserva')+'</small><input id="finalInv'+i+'" type="number" min="0" step="1" value="" placeholder="0" inputmode="numeric"></div>'));
+    const updateFinal=()=>{let u=0,kg=0;ps.forEach((p,i)=>{const n=Math.max(0,Math.floor(+$('finalInv'+i).value||0));u+=n;kg+=n*p.kg});$('finalInvTotal').textContent=fmt(u)+' unidades · '+fmt(kg)+' kg'};
+    ps.forEach((_,i)=>$('finalInv'+i).addEventListener('input',updateFinal));updateFinal();
+  }
+  function readFinalInventory(){
+    const ps=stockProducts(),counts=[];
+    for(let i=0;i<ps.length;i++){
+      const el=$('finalInv'+i);
+      if(!el||String(el.value).trim()===''){return null}
+      counts.push(Math.max(0,Math.floor(Number(el.value)||0)));
+    }
+    return inventorySnapshot(ps,counts);
+  }
+  function setSaveStatus(text,kind){const el=$('saveStatus');el.textContent=text||'';el.className='saveStatus'+(kind?' '+kind:'')}
+  function showSyncNotice(text,kind){const el=$('syncNotice');if(!text){el.className='syncNotice';el.textContent='';return}el.textContent=text;el.className='syncNotice show '+(kind||'')}
+  function queueRecord(rec){pendingSync=pendingSync.filter(x=>String(x.ts)!==String(rec.ts));pendingSync.push(rec);savePending()}
+  async function postRecord(rec){
+    try{const r=await fetch('/api/turnos',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(rec),keepalive:true});return r.ok}catch(e){return false}
+  }
+  async function syncPending(){
+    if(navigator.onLine===false)return false;
+    let changed=false,remaining=[];
+    for(const rec of pendingSync){if(await postRecord(rec)){changed=true}else remaining.push(rec)}
+    pendingSync=remaining;
+    const deleteRemaining=[];
+    for(const ts of pendingDeletes){try{const r=await fetch('/api/turnos?ts='+encodeURIComponent(ts),{method:'DELETE',keepalive:true});if(r.ok){changed=true}else deleteRemaining.push(ts)}catch(e){deleteRemaining.push(ts)}}
+    pendingDeletes=deleteRemaining;savePending();
+    if(pendingSync.length||pendingDeletes.length)showSyncNotice('Guardado en este iPad. Hay '+(pendingSync.length+pendingDeletes.length)+' cambio(s) esperando conexión con el respaldo central.','warn');
+    else if(changed)showSyncNotice('Respaldo central actualizado correctamente.','ok');
+    return !pendingSync.length&&!pendingDeletes.length;
+  }
   $('endBtn').onclick=()=>{
     const p=S.crew.length,kg=totKg(),m=mallasEq(kg),r=pozoEffAt(kg,p),th=scaled(p);
     const bags=S.counts.reduce((a,b)=>a+b,0);
@@ -740,24 +819,33 @@ h1.mega .lime{color:var(--lime)}
     $('sumSub').textContent=r.pozo>0
       ?'¡Buen turno! Guarda para que quede en la reportería.'
       :(below?'Día bajo la base — ojo: máximo '+MAX_BELOW+' al mes o se invalida el bono. 💪':'Hoy no hubo bono — mañana se remonta. 💪');
+    renderFinalInventory();setSaveStatus('','');
     $('overlay').classList.add('show');
   };
   $('backBtn').onclick=()=>$('overlay').classList.remove('show');
-  $('saveBtn').onclick=()=>{
+  $('saveBtn').onclick=async()=>{
+    const finalInventory=readFinalInventory();
+    if(!finalInventory){setSaveStatus('Completa todos los productos del inventario final, aunque el valor sea 0.','bad');return}
+    const saveBtn=$('saveBtn');saveBtn.disabled=true;saveBtn.textContent='Guardando…';setSaveStatus('Primero se guardará en este iPad y luego en el respaldo central.','');
     const p=S.crew.length,kg=totKg(),m=mallasEq(kg),r=pozoEffAt(kg,p),th=scaled(p);
     const bags=S.counts.reduce((a,b)=>a+b,0);
+    const production=inventorySnapshot(PRODUCTS,S.counts);
     const rec={
-      ts:S.start, month:monthKey(S.start), people:p, bags, kg, m:Math.round(m*10)/10,
+      id:String(S.start),recordVersion:2,ts:S.start,savedAt:Date.now(),deviceId,shift:shiftName(S.start),month:monthKey(S.start),people:p,bags,kg,m:Math.round(m*10)/10,
       level:r.li<0?(r.pozo>0?'N1':'—'):(r.li===0?(r.pozo>0?'N1':'Base'):'N'+r.li),
-      pozo:Math.round(r.pozo), ppLiq:Math.round(r.pozo/p*NET), below:m<th[0], crew:S.crew
+      pozo:Math.round(r.pozo),ppLiq:Math.round(r.pozo/p*NET),below:m<th[0],crew:S.crew,crewByShift:S.crewByShift||null,
+      initialInventory:S.initialInventory||inventorySnapshot(PRODUCTS,S.inv||PRODUCTS.map(()=>0),S.start),production,finalInventory
     };
-    history.push(rec);
+    history=history.filter(x=>String(x.ts)!==String(rec.ts));history.push(rec);history.sort((a,b)=>a.ts-b.ts);
     saveHist();
-    fetch('/api/turnos',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(rec)}).catch(()=>{});
+    queueRecord(rec);
+    const synced=await syncPending();
     localStorage.removeItem('turnoState');S=null;lastMilestone=-1;lastZone=-1;
     $('overlay').classList.remove('show');
     $('main').style.display='none';$('setup').style.display='block';
-    selected=new Set();renderChips();updInv();renderSetupWarn();
+    selected=new Set();renderChips();renderInitialInventory();renderSetupWarn();
+    saveBtn.disabled=false;saveBtn.textContent='Guardar y cerrar turno';
+    showSyncNotice(synced?'Turno guardado en este iPad y en el respaldo central.':'Turno guardado en este iPad. El respaldo central se completará automáticamente al volver la conexión.',synced?'ok':'warn');
   };
 
   // ------- reportería -------
@@ -766,8 +854,9 @@ h1.mega .lime{color:var(--lime)}
   }
   let reportSource=null;
   const visibleRecords=list=>(list||[]).filter(h=>!deletedDays.has(String(h.ts)));
-  function requestServerDelete(ts){
-    fetch('/api/turnos?ts='+encodeURIComponent(ts),{method:'DELETE'}).catch(()=>{});
+  async function requestServerDelete(ts){
+    try{const r=await fetch('/api/turnos?ts='+encodeURIComponent(ts),{method:'DELETE',keepalive:true});if(r.ok)return true}catch(e){}
+    if(!pendingDeletes.includes(String(ts)))pendingDeletes.push(String(ts));savePending();return false;
   }
   function removeRecords(records){
     const ids=new Set(records.map(h=>String(h.ts)));
@@ -775,6 +864,10 @@ h1.mega .lime{color:var(--lime)}
     history=history.filter(h=>!ids.has(String(h.ts)));
     if(reportSource)reportSource=reportSource.filter(h=>!ids.has(String(h.ts)));
     saveHist();saveDeleted();renderReport(reportSource||history);
+  }
+  function inventoryColumn(title,snap){
+    if(!snap||!Array.isArray(snap.items))return '<div class="turnDetailCol"><b>'+title+'</b><div class="turnDetailItem">Sin detalle en registros antiguos</div></div>';
+    return '<div class="turnDetailCol"><b>'+title+'</b>'+snap.items.map(x=>'<div class="turnDetailItem"><span>'+x.name+(x.tag?' · '+x.tag:'')+'</span><strong>'+fmt(x.units)+'</strong></div>').join('')+'<div class="turnDetailItem turnDetailTotal"><span>Total</span><strong>'+fmt(snap.totalUnits)+' · '+fmt(snap.totalKg)+' kg</strong></div></div>';
   }
   function renderReport(list){
     if(list)reportSource=visibleRecords(list);
@@ -810,7 +903,8 @@ h1.mega .lime{color:var(--lime)}
           <div class="lvl" style="border:1px solid ${lvlCol};color:${lvlCol}">${h.below?'BAJO BASE':h.level}</div>
           <div class="pz">${money(h.pozo)}</div>
           <button class="deleteDay" data-ts="${h.ts}" aria-label="Borrar turno del ${d.getDate()} de ${MESES_L[d.getMonth()]}">✕</button>
-        </div>`);
+        </div>
+        <details class="turnDetail"><summary>Ver inventario inicial, producción y final</summary><div class="turnDetailGrid">${inventoryColumn('Inventario inicial',h.initialInventory)}${inventoryColumn('Producción',h.production)}${inventoryColumn('Inventario final',h.finalInventory)}</div></details>`);
     });
     hl.querySelectorAll('.deleteDay').forEach(btn=>btn.onclick=()=>{
       const rec=src.find(h=>String(h.ts)===String(btn.dataset.ts));
@@ -822,13 +916,14 @@ h1.mega .lime{color:var(--lime)}
   $('repBtn').onclick=async()=>{
     reportSource=null;renderReport(history);
     $('setup').style.display='none';$('report').style.display='block';window.scrollTo(0,0);
+    await syncPending();
     const sv=await fetchServer();
     if(sv){
       const cleanServer=visibleRecords(sv);
-      const seen=new Set(cleanServer.map(h=>String(h.ts)));
-      const localOnly=visibleRecords(history).filter(h=>!seen.has(String(h.ts)));
-      localOnly.forEach(h=>fetch('/api/turnos',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(h)}).catch(()=>{}));
-      const merged=[...cleanServer,...localOnly].sort((a,b)=>a.ts-b.ts);
+      const byId=new Map(cleanServer.map(h=>[String(h.ts),h]));
+      visibleRecords(history).forEach(h=>{const current=byId.get(String(h.ts));if(!current||Number(h.recordVersion||0)>=Number(current.recordVersion||0))byId.set(String(h.ts),h)});
+      const merged=[...byId.values()].sort((a,b)=>a.ts-b.ts);
+      history=merged;saveHist();
       renderReport(merged);
     }
   };
@@ -846,7 +941,11 @@ h1.mega .lime{color:var(--lime)}
   };
 
   // ------- init -------
-  renderChips();updInv();renderSetupWarn();
+  renderInitialInventory();renderChips();renderSetupWarn();
+  window.THE_ICE_SYNC_TURNOS=syncPending;
+  window.addEventListener('online',syncPending);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncPending()});
+  setTimeout(syncPending,500);
   if(S&&S.start){showMain()}
 })();
 </script>
