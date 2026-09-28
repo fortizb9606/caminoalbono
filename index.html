@@ -400,6 +400,14 @@ h1.mega .lime{color:var(--lime)}
   };
 
   // ------- estado -------
+  // Limpieza única para comenzar la operación del 28-09-2026 desde cero.
+  // Se conservan nombres, productos, configuración, dispositivo y clave de respaldo.
+  const CLEAN_START_MARK='caminoCleanStart20260928';
+  if(localStorage.getItem(CLEAN_START_MARK)!=='done'){
+    ['turnoState','turnoHistory','turnoPendingSyncV1','turnoPendingDeletesV1','deletedTurnoDays','theIcePendingFinalInventoryV1']
+      .forEach(key=>localStorage.removeItem(key));
+    localStorage.setItem(CLEAN_START_MARK,'done');
+  }
   let S=null;
   try{S=JSON.parse(localStorage.getItem('turnoState')||'null')}catch(e){}
   let rosters=JSON.parse(JSON.stringify(ROSTER_BASE));
