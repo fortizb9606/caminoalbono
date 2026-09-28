@@ -191,6 +191,21 @@ h1.mega .lime{color:var(--lime)}
 .historyActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .dangerBtn{border-color:#5c2a1e;color:var(--coral);margin-top:0}
 .dangerBtn.strong{background:#241614}
+.adminToolbar{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:16px}
+.adminToolbar label{display:block;font-family:Oswald;font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.adminSelect{min-width:190px;min-height:48px;background:var(--input);border:1px solid var(--line2);border-radius:12px;color:var(--text);padding:10px 14px;font:600 15px Archivo}
+.adminPeople{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.personCard{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:16px;min-width:0}
+.personHead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.personName{font-family:Oswald;font-size:20px;font-weight:600;text-transform:uppercase;overflow-wrap:anywhere}
+.personBonus{font-family:Oswald;font-size:23px;font-weight:600;color:var(--lime);white-space:nowrap}
+.personStats{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.personStats span{border:1px solid var(--line2);border-radius:999px;padding:5px 9px;color:var(--muted2);font-size:10px;font-weight:600}
+.personDetail{margin-top:12px;border-top:1px solid var(--line);padding-top:9px}
+.personDetail summary{cursor:pointer;color:var(--agua);font:600 11px Oswald;letter-spacing:.1em;text-transform:uppercase;min-height:44px;display:flex;align-items:center}
+.personShift{display:grid;grid-template-columns:1fr auto;gap:5px 12px;padding:8px 0;border-top:1px solid var(--line);font-size:11px;color:var(--muted2)}
+.personShift:first-of-type{border-top:0}.personShift b{color:var(--text);font-family:Oswald}.personShift small{grid-column:1/-1;color:var(--muted)}
+.adminEmpty{border:1px dashed var(--line2);border-radius:16px;padding:24px;color:var(--muted2);text-align:center;line-height:1.5}
 .disc{text-align:center;font-size:11px;color:#4d5a55;margin:18px 4px 0;line-height:1.5}
 .confetti{position:fixed;top:-20px;font-size:22px;z-index:99;pointer-events:none;animation:fall linear forwards}
 @keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.3}}
@@ -208,6 +223,8 @@ h1.mega .lime{color:var(--lime)}
   .histRow .v{grid-column:1/-1;grid-row:2}.histRow .pz{grid-column:2;grid-row:1}.histRow .deleteDay{grid-column:3;grid-row:1/3}
   .historyActions{grid-template-columns:1fr}
   .turnDetailGrid{grid-template-columns:1fr}
+  .adminPeople{grid-template-columns:1fr}
+  .adminToolbar{align-items:stretch;flex-direction:column}.adminSelect{width:100%}
 }
 </style>
 </head>
@@ -247,7 +264,7 @@ h1.mega .lime{color:var(--lime)}
     </div>
 
     <button class="startBtn" id="startBtn" disabled>Iniciar turno</button>
-    <button class="ghostBtn" id="repBtn">Reportería del mes</button>
+    <button class="ghostBtn" id="adminBtn">Vista administración</button>
     <button class="ghostBtn" id="connectSyncBtn">Conectar respaldo central</button>
     <div class="warnLine" id="setupWarn"></div>
     <div class="syncNotice" id="syncNotice" aria-live="polite"></div>
@@ -336,6 +353,39 @@ h1.mega .lime{color:var(--lime)}
     <p class="disc">Reportería referencial · los montos definitivos se confirman en el cierre formal de administración con los inventarios.</p>
   </div>
 
+  <!-- ============ ADMINISTRACIÓN ============ -->
+  <div id="admin" style="display:none">
+    <div class="brandRow">
+      <div class="brand"><div class="ti">TI</div><span>THE ICE</span></div>
+      <div class="dateLab">ACCESO PROTEGIDO</div>
+    </div>
+    <h1 class="mega" style="font-size:44px">Vista<br><span class="lime">administración</span></h1>
+    <p class="lede">Bonos individuales calculados desde los turnos guardados en el respaldo central.</p>
+
+    <div class="card">
+      <div class="adminToolbar">
+        <div><label for="adminMonth">Mes a revisar</label><select class="adminSelect" id="adminMonth"></select></div>
+        <span class="countBadge" id="adminUpdated">Datos centrales</span>
+      </div>
+      <div class="repGrid">
+        <div class="rep limeV"><span>Bonos líquidos asignados</span><b id="adminNet">$0</b><small>suma de todas las personas</small></div>
+        <div class="rep aguaV"><span>Pozo bruto acumulado</span><b id="adminGross">$0</b><small>en los turnos del mes</small></div>
+        <div class="rep"><span>Personas con turnos</span><b id="adminPeopleCount">0</b><small>con participación registrada</small></div>
+        <div class="rep"><span>Turnos cerrados</span><b id="adminShiftCount">0</b><small>guardados en la base central</small></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="sec">Bono por persona</p>
+      <p class="secSub">Cada monto suma el líquido del turno sólo a quienes aparecen en ese equipo.</p>
+      <div class="adminPeople" id="adminPeople"></div>
+    </div>
+
+    <button class="ghostBtn" id="adminReportBtn">Ver reportería y administrar días</button>
+    <button class="ghostBtn" id="adminBack">← Cerrar administración</button>
+    <p class="disc">Vista privada · los montos son referenciales hasta la validación del cierre formal.</p>
+  </div>
+
   <!-- ============ SUMMARY ============ -->
   <div class="overlay" id="overlay">
     <div class="sumCard" id="sumCard">
@@ -386,6 +436,7 @@ h1.mega .lime{color:var(--lime)}
   const $=id=>document.getElementById(id);
   const fmt=n=>new Intl.NumberFormat('es-CL').format(Math.round(n));
   const money=n=>"$"+fmt(n);
+  const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const DIAS=['DOMINGO','LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO'];
   const DIAS_S=['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
   const MESES=['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
@@ -863,20 +914,22 @@ h1.mega .lime{color:var(--lime)}
   };
 
   // ------- reportería -------
-  async function fetchServer(){
-    if(!syncKey())return null;
-    try{const r=await fetch('/api/turnos',{cache:'no-store',headers:{'x-turno-key':syncKey()}});if(!r.ok)throw 0;const j=await r.json();return Array.isArray(j)?j:null}catch(e){return null}
+  async function fetchServer(key){
+    const accessKey=key||syncKey();
+    if(!accessKey)return null;
+    try{const r=await fetch('/api/turnos',{cache:'no-store',headers:{'x-turno-key':accessKey}});if(!r.ok)throw 0;const j=await r.json();return Array.isArray(j)?j:null}catch(e){return null}
   }
-  let reportSource=null;
+  let reportSource=null,adminSessionKey='';
   const visibleRecords=list=>(list||[]).filter(h=>!deletedDays.has(String(h.ts)));
   async function requestServerDelete(ts){
-    try{const r=await fetch('/api/turnos?ts='+encodeURIComponent(ts),{method:'DELETE',headers:{'x-turno-key':syncKey()},keepalive:true});if(r.ok)return true}catch(e){}
+    try{const r=await fetch('/api/turnos?ts='+encodeURIComponent(ts),{method:'DELETE',headers:{'x-turno-key':adminSessionKey||syncKey()},keepalive:true});if(r.ok)return true}catch(e){}
     if(!pendingDeletes.includes(String(ts)))pendingDeletes.push(String(ts));savePending();return false;
   }
   function removeRecords(records){
     const ids=new Set(records.map(h=>String(h.ts)));
     ids.forEach(id=>{deletedDays.add(id);requestServerDelete(id)});
     history=history.filter(h=>!ids.has(String(h.ts)));
+    adminRecords=adminRecords.filter(h=>!ids.has(String(h.ts)));
     if(reportSource)reportSource=reportSource.filter(h=>!ids.has(String(h.ts)));
     saveHist();saveDeleted();renderReport(reportSource||history);
   }
@@ -928,20 +981,75 @@ h1.mega .lime{color:var(--lime)}
       if(confirm('¿Borrar el turno del '+d.getDate()+' de '+MESES_L[d.getMonth()]+'? Esta acción no se puede deshacer.'))removeRecords([rec]);
     });
   }
-  $('repBtn').onclick=async()=>{
-    reportSource=null;renderReport(history);
-    $('setup').style.display='none';$('report').style.display='block';window.scrollTo(0,0);
-    await syncPending();
-    const sv=await fetchServer();
-    if(sv){
-      const cleanServer=visibleRecords(sv);
-      const byId=new Map(cleanServer.map(h=>[String(h.ts),h]));
-      visibleRecords(history).forEach(h=>{const current=byId.get(String(h.ts));if(!current||Number(h.recordVersion||0)>=Number(current.recordVersion||0))byId.set(String(h.ts),h)});
-      const merged=[...byId.values()].sort((a,b)=>a.ts-b.ts);
-      history=merged;saveHist();
-      renderReport(merged);
+  function openAdminReport(){
+    reportSource=null;renderReport(adminRecords);
+    $('admin').style.display='none';$('report').style.display='block';window.scrollTo(0,0);
+  }
+
+  // ------- vista privada de administración -------
+  let adminRecords=[];
+  function recordCrew(rec){
+    const names=Array.isArray(rec.crew)?rec.crew.slice():[];
+    if(!names.length&&rec.crewByShift&&typeof rec.crewByShift==='object'){
+      Object.keys(rec.crewByShift).forEach(k=>{if(Array.isArray(rec.crewByShift[k]))names.push(...rec.crewByShift[k])});
     }
+    return [...new Set(names.map(x=>String(x).trim()).filter(Boolean))];
+  }
+  function adminMonthLabel(mk){
+    const parts=String(mk).split('-'),month=MESES_L[Math.max(0,Number(parts[1])-1)]||mk;
+    return month+' '+(parts[0]||'');
+  }
+  function setupAdminMonths(){
+    const current=monthKey(Date.now());
+    const months=[...new Set(adminRecords.map(r=>r.month||monthKey(r.ts)).filter(Boolean))];
+    if(!months.includes(current))months.push(current);
+    months.sort().reverse();
+    $('adminMonth').innerHTML=months.map(m=>'<option value="'+esc(m)+'">'+esc(adminMonthLabel(m))+'</option>').join('');
+    $('adminMonth').value=months.includes(current)?current:months[0];
+  }
+  function renderAdmin(){
+    const mk=$('adminMonth').value||monthKey(Date.now());
+    const rows=adminRecords.filter(r=>(r.month||monthKey(r.ts))===mk);
+    const people=new Map();
+    rows.forEach(rec=>{
+      const amount=Math.max(0,Number(rec.ppLiq)||0);
+      recordCrew(rec).forEach(name=>{
+        if(!people.has(name))people.set(name,{name,bonus:0,shifts:0,bonusShifts:0,details:[]});
+        const p=people.get(name),d=new Date(Number(rec.ts)||Date.now());
+        p.bonus+=amount;p.shifts++;if(amount>0)p.bonusShifts++;
+        p.details.push({ts:Number(rec.ts)||0,date:d,shift:rec.shift||shiftName(rec.ts),amount,bags:Number(rec.bags)||0,kg:Number(rec.kg)||0});
+      });
+    });
+    const list=[...people.values()].sort((a,b)=>b.bonus-a.bonus||a.name.localeCompare(b.name,'es'));
+    const totalNet=list.reduce((sum,p)=>sum+p.bonus,0);
+    $('adminNet').textContent=money(totalNet);
+    $('adminGross').textContent=money(rows.reduce((sum,r)=>sum+(Number(r.pozo)||0),0));
+    $('adminPeopleCount').textContent=fmt(list.length);
+    $('adminShiftCount').textContent=fmt(rows.length);
+    $('adminUpdated').textContent=adminMonthLabel(mk);
+    const box=$('adminPeople');
+    if(!list.length){box.innerHTML='<div class="adminEmpty" style="grid-column:1/-1">Todavía no hay turnos cerrados para '+esc(adminMonthLabel(mk))+'. Cuando se guarde el primero desde el iPad aparecerá aquí.</div>';return}
+    box.innerHTML=list.map(p=>{
+      const details=p.details.sort((a,b)=>b.ts-a.ts).map(x=>'<div class="personShift"><span>'+esc(DIAS_S[x.date.getDay()]+' '+x.date.getDate()+' · '+x.shift)+'</span><b>'+money(x.amount)+'</b><small>'+fmt(x.bags)+' mallas · '+fmt(x.kg)+' kg producidos</small></div>').join('');
+      return '<article class="personCard"><div class="personHead"><div class="personName">'+esc(p.name)+'</div><div class="personBonus">'+money(p.bonus)+'</div></div><div class="personStats"><span>'+p.shifts+(p.shifts===1?' turno':' turnos')+'</span><span>'+p.bonusShifts+' con bono</span></div><details class="personDetail"><summary>Ver detalle por fecha</summary>'+details+'</details></article>';
+    }).join('');
+  }
+  $('adminBtn').onclick=async()=>{
+    const key=prompt('Ingresa la clave de administración:');
+    if(!key||!key.trim())return;
+    const btn=$('adminBtn'),original=btn.textContent;btn.disabled=true;btn.textContent='Comprobando clave…';
+    const serverRows=await fetchServer(key.trim());
+    btn.disabled=false;btn.textContent=original;
+    if(serverRows===null){alert('La clave no es correcta o el respaldo central no está disponible.');return}
+    adminSessionKey=key.trim();
+    adminRecords=visibleRecords(serverRows).sort((a,b)=>a.ts-b.ts);
+    setupAdminMonths();renderAdmin();
+    $('setup').style.display='none';$('report').style.display='none';$('admin').style.display='block';window.scrollTo(0,0);
   };
+  $('adminMonth').onchange=renderAdmin;
+  $('adminReportBtn').onclick=openAdminReport;
+  $('adminBack').onclick=()=>{adminSessionKey='';adminRecords=[];$('adminPeople').innerHTML='';$('admin').style.display='none';$('setup').style.display='block';window.scrollTo(0,0)};
+
   $('connectSyncBtn').onclick=async()=>{
     const key=prompt('Ingresa la clave del respaldo central:');
     if(!key||!key.trim())return;
@@ -952,7 +1060,7 @@ h1.mega .lime{color:var(--lime)}
     if(ok){$('connectSyncBtn').textContent='Respaldo central conectado';showSyncNotice('Respaldo central conectado correctamente.','ok')}
     else{showSyncNotice('No se pudo conectar. Revisa la clave o la conexión e inténtalo otra vez.','warn')}
   };
-  $('repBack').onclick=()=>{$('report').style.display='none';$('setup').style.display='block'};
+  $('repBack').onclick=()=>{$('report').style.display='none';if(adminSessionKey){renderAdmin();$('admin').style.display='block'}else{$('setup').style.display='block'}window.scrollTo(0,0)};
   $('deleteMonthBtn').onclick=()=>{
     const mk=monthKey(Date.now());
     const rows=visibleRecords(reportSource||history).filter(h=>h.month===mk);
