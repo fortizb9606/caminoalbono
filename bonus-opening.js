@@ -20,7 +20,13 @@ function eff(kg,p,c){
   const th=c.thresholdKg[p], r=raw(kg,p,c);
   let pozo=r.pozo;
   [2,3,4].forEach(i=>{
-    if(kg>=th[i]) pozo=Math.max(pozo,raw(Math.max(0,th[i]-c.eqKg),p,c).pozo);
+    if(kg>=th[i]){
+      const scale=c.scale&&c.scale[p]||1;
+      const labor=p*c.cost;
+      const sav=Math.max(0,c.target*scale*th[i]-labor);
+      const floor=sav*c.shares[i-2];
+      pozo=Math.max(pozo,floor);
+    }
   });
   return {...r,pozo,frozen:pozo>r.pozo+.5};
 }
@@ -35,8 +41,9 @@ function level(kg,p,c){
 }
 function rowData(kg,p,c){
   const labor=p*c.cost, r=eff(kg,p,c);
-  const gross=p?r.pozo/p:0;
-  const liq=gross*c.net;
+  const legal=c.legalDiscount==null?.24:Number(c.legalDiscount);
+  const gross=p?r.pozo/p*c.net:0;
+  const liq=gross*(1-legal);
   const final=kg?(labor+r.pozo)/kg:0;
   const company=Math.max(0,r.sav-r.pozo);
   return {r,gross,liq,final,company};
