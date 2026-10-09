@@ -14,49 +14,81 @@ netlify.toml                   ← config de publicación
 package.json                   ← dependencia @netlify/blobs (solo para la function)
 ```
 
-## Modelo de bono (proporcional por persona)
+## Modelo de bono — Octubre 2026
 
-La calculadora vigente queda anclada a estas dos referencias reales:
+La lógica final del bono es proporcional por producción por persona y se calcula con **kg reales**.
 
-- **3 personas · 140 mallas = $5.306 líquidos por persona**
-- **3 personas · 150 mallas = $6.732 líquidos por persona**
-- Por proporcionalidad, **5 personas · 250 mallas = $6.732 líquidos por persona** porque ambos casos son 50 mallas por persona.
+### Parámetros
 
-Parámetros:
+- 1 malla equivalente = **15 kg**
+- Valor del kilo para generar ahorro = **$72/kg**
+- Costo de turno = **$37.000 por persona**
+- N1 = **55%** del ahorro al pozo
+- N2 = **50%**
+- N3 = **40%**
+- N4 = **30%**
+- Del pozo individual se reconoce **72% como bruto**
+- Al bruto se le descuenta **24% legal**
+- Factor líquido final sobre el pozo individual = **72% × 76% = 54,72%**
+- El pozo se reparte en partes iguales entre quienes hicieron el turno
+- **El pozo nunca baja** al cruzar de nivel
 
-- Costo bruto por persona/turno: **$37.000**
-- Objetivo de ahorro: **$72/kg**
-- Factor líquido: **72%**
-- Malla equivalente: **15 kg**
-- Factor de escala por tamaño de equipo: **100% para 3 a 9 personas**
-- Reparto del ahorro: **N1 55% · N2 50% · N3 40% · N4 30%**
-- Regla **“el pozo nunca baja”**: al cruzar a un nivel con menor porcentaje se conserva el pozo ya alcanzado hasta que la nueva fórmula lo supere.
+### Fórmula
 
-Fórmula:
+```text
+kg = kilos reales registrados
 
-```
-kg = mallas_equivalentes * 15
 costo_turno = personas * 37000
 ahorro = max(0, kg * 72 - costo_turno)
-pozo_equipo = ahorro * porcentaje_del_nivel
-liquido_persona = (pozo_equipo / personas) * 0.72
+
+pozo_raw = ahorro * porcentaje_nivel
+
+pozo_protegido = max(
+  pozo_raw,
+  pisos_de_pozo_ya_alcanzados_en_cambios_de_nivel
+)
+
+bruto_persona = (pozo_protegido / personas) * 0.72
+liquido_persona = bruto_persona * 0.76
 ```
 
-El bono se escala por producción por persona: a igual cantidad de mallas por persona, corresponde el mismo líquido por persona, independiente del tamaño del equipo.
+Importante: el piso de protección se toma **en el umbral exacto** del nivel usando el porcentaje del nivel anterior. Ejemplo: al entrar a N4 se protege el pozo que habría correspondido en ese mismo umbral usando 40%, hasta que la fórmula N4 de 30% lo supere.
 
-### Metas proporcionales
+### Umbrales
 
-| Personas | Base mallas eq. | N1 bono | N2 | N3 | N4 |
-|---:|---:|---:|---:|---:|---:|
-| 3 | 100,0 | 110,0 | 151,0 | 174,0 | 208,0 |
-| 4 | 133,3 | 146,7 | 201,3 | 232,0 | 277,3 |
-| 5 | 166,7 | 183,3 | 251,7 | 290,0 | 346,7 |
-| 6 | 200,0 | 220,0 | 302,0 | 348,0 | 416,0 |
-| 7 | 233,3 | 256,7 | 352,3 | 406,0 | 485,3 |
-| 8 | 266,7 | 293,3 | 402,7 | 464,0 | 554,7 |
-| 9 | 300,0 | 330,0 | 453,0 | 522,0 | 624,0 |
+| Personas | N1 | N2 | N3 | N4 |
+|---:|---:|---:|---:|---:|
+| 3 | 110 | 151 | 174 | 208 |
+| 4 | 146,7 | 201,3 | 232 | 277,3 |
+| 5 | 183,3 | 251,7 | 290 | 346,7 |
+| 6 | 220 | 302 | 348 | 416 |
+| 7 | 256,7 | 352,3 | 406 | 485,3 |
+| 8 | 293,3 | 402,7 | 464 | 554,7 |
+| 9 | 330 | 453 | 522 | 624 |
 
-La app calcula con **kg reales**; las mallas son una equivalencia visual de 15 kg.
+La proporción es pareja: **50 mallas por persona pagan lo mismo**, independiente del tamaño del equipo.
+
+### Casos de prueba oficiales
+
+#### 4 personas
+
+| Mallas | Líquido/persona | ×22 días |
+|---:|---:|---:|
+| 151 | $1.135 | $24.962 |
+| 174 | $3.004 | $66.079 |
+| 210 | $5.390 | $118.578 |
+| 288 | $8.291 | $182.406 |
+
+#### 5 personas
+
+| Mallas | Líquido/persona | ×22 días |
+|---:|---:|---:|
+| 188 | $1.086 | $23.889 |
+| 218 | $3.036 | $66.794 |
+| 260 | $5.242 | $115.328 |
+| 357 | $8.291 | $182.406 |
+
+Estos casos deben usarse como tests de regresión al replicar o modificar la calculadora.
 
 ## API de reportería (`/api/turnos`)
 
