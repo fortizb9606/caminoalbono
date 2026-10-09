@@ -14,14 +14,49 @@ netlify.toml                   ← config de publicación
 package.json                   ← dependencia @netlify/blobs (solo para la function)
 ```
 
-## Modelo de bono (setting final)
+## Modelo de bono (proporcional por persona)
 
-- Costo bruto empresa: **$37.000** por persona/turno · malla 15 kg · objetivo **$70/kg** MO · líquido ≈ 76% del bruto.
-- Metas de referencia a 6 personas: Base 190 · N1 220 · N2 260 · N3 300 · N4 360. **Escalan por dotación** (× personas ÷ 6); el bono parte cuando la MO real baja de $70/kg (malla 212 con 6 personas).
-- Perillas de reparto del ahorro: **N1 100% · N2 80% · N3 70% · N4 60%** equipo.
-- **Regla "el pozo nunca baja"**: al cruzar de nivel se conserva lo ya logrado en la malla anterior al umbral, hasta que el cálculo nuevo lo supere (misma regla en la calculadora).
-- Turnos por reloj: día 07:00–16:00 · noche 22:00–07:00 · **8 h efectivas** (colación 12–13 / 02–03 descontada). Ritmo y proyección se calculan contra el reloj del turno, no contra el uso de la app.
-- Cifras referenciales: el cierre oficial lo valida administración con el inventario.
+La calculadora vigente queda anclada a estas dos referencias reales:
+
+- **3 personas · 140 mallas = $5.306 líquidos por persona**
+- **3 personas · 150 mallas = $6.732 líquidos por persona**
+- Por proporcionalidad, **5 personas · 250 mallas = $6.732 líquidos por persona** porque ambos casos son 50 mallas por persona.
+
+Parámetros:
+
+- Costo bruto por persona/turno: **$37.000**
+- Objetivo de ahorro: **$72/kg**
+- Factor líquido: **72%**
+- Malla equivalente: **15 kg**
+- Factor de escala por tamaño de equipo: **100% para 3 a 9 personas**
+- Reparto del ahorro: **N1 55% · N2 50% · N3 40% · N4 30%**
+- Regla **“el pozo nunca baja”**: al cruzar a un nivel con menor porcentaje se conserva el pozo ya alcanzado hasta que la nueva fórmula lo supere.
+
+Fórmula:
+
+```
+kg = mallas_equivalentes * 15
+costo_turno = personas * 37000
+ahorro = max(0, kg * 72 - costo_turno)
+pozo_equipo = ahorro * porcentaje_del_nivel
+liquido_persona = (pozo_equipo / personas) * 0.72
+```
+
+El bono se escala por producción por persona: a igual cantidad de mallas por persona, corresponde el mismo líquido por persona, independiente del tamaño del equipo.
+
+### Metas proporcionales
+
+| Personas | Base mallas eq. | N1 bono | N2 | N3 | N4 |
+|---:|---:|---:|---:|---:|---:|
+| 3 | 100,0 | 110,0 | 151,0 | 174,0 | 208,0 |
+| 4 | 133,3 | 146,7 | 201,3 | 232,0 | 277,3 |
+| 5 | 166,7 | 183,3 | 251,7 | 290,0 | 346,7 |
+| 6 | 200,0 | 220,0 | 302,0 | 348,0 | 416,0 |
+| 7 | 233,3 | 256,7 | 352,3 | 406,0 | 485,3 |
+| 8 | 266,7 | 293,3 | 402,7 | 464,0 | 554,7 |
+| 9 | 300,0 | 330,0 | 453,0 | 522,0 | 624,0 |
+
+La app calcula con **kg reales**; las mallas son una equivalencia visual de 15 kg.
 
 ## API de reportería (`/api/turnos`)
 
