@@ -9,8 +9,8 @@ function people(){const s=activeState();if(s&&Array.isArray(s.crew)&&s.crew.leng
 function currentKg(){const t=($('kgToday')&&$('kgToday').textContent)||'0';return Number(t.replace(/\./g,'').replace(',','.').replace(/[^0-9.-]/g,''))||0}
 function cfg(){return window.BONUS_CFG||window.BONUS_CONFIG_DEFAULTS||null}
 function raw(kg,p,c){const scale=c.scale&&c.scale[p]?Number(c.scale[p]):1,labor=p*c.cost,sav=Math.max(0,(c.target*scale)*kg-labor),th=c.thresholdKg[p];if(!th||kg<th[1]||sav<=0)return{sav,share:0,pozo:0,li:-1};let li=-1;th.forEach((v,i)=>{if(kg>=v)li=i});const share=li>=2?c.shares[Math.min(li-1,3)]:c.shares[0];return{sav,share,pozo:sav*share,li}}
-function eff(kg,p,c){const th=c.thresholdKg[p],r=raw(kg,p,c);let pozo=r.pozo;[2,3,4].forEach(i=>{if(kg>=th[i])pozo=Math.max(pozo,raw(Math.max(0,th[i]-c.eqKg),p,c).pozo)});return{...r,pozo,frozen:pozo>r.pozo+.5}}
-function liquidPerPerson(kg,p,c){const r=eff(kg,p,c);return p?r.pozo/p*c.net:0}
+function eff(kg,p,c){const th=c.thresholdKg[p],r=raw(kg,p,c);let pozo=r.pozo;[2,3,4].forEach(i=>{if(kg>=th[i]){const scale=c.scale&&c.scale[p]?Number(c.scale[p]):1,labor=p*c.cost,sav=Math.max(0,(c.target*scale)*th[i]-labor),floor=sav*c.shares[i-2];pozo=Math.max(pozo,floor)}});return{...r,pozo,frozen:pozo>r.pozo+.5}}
+function liquidPerPerson(kg,p,c){const r=eff(kg,p,c),legal=c.legalDiscount==null?.24:Number(c.legalDiscount);return p?r.pozo/p*c.net*(1-legal):0}
 
 function css(){if($('activeToolsCss'))return;const s=document.createElement('style');s.id='activeToolsCss';s.textContent=`
 .atActions{display:flex;gap:7px;justify-content:flex-end;flex-wrap:wrap;margin-top:6px}.atBtn{border:1px solid var(--line2);background:transparent;color:var(--muted2);border-radius:12px;padding:11px 14px;font:600 11px Oswald;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;min-height:44px}.atBtn.open{border-color:var(--agua);color:var(--agua)}.atBtn.back{color:var(--muted)}
