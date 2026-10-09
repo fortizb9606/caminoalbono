@@ -4,6 +4,10 @@ const BK='theIceBonusConfigV3',PK='theIceProductsV1',SK='theIceCentralConfigSeen
 function same(a,b){try{return JSON.stringify(a)===JSON.stringify(b)}catch{return false}}
 function clone(o){return JSON.parse(JSON.stringify(o))}
 function migrateOldBonus(c){
+  if(c&&typeof c==='object'){
+    c={...c};
+    if(c.legalDiscount==null)c.legalDiscount=.24;
+  }
   return c;
 }
 function readBonusFromForm(){
@@ -13,6 +17,7 @@ function readBonusFromForm(){
   c.cost=Math.max(0,+g('bcCost').value||0);
   c.target=Math.max(0,+g('bcTarget').value||0);
   c.net=Math.max(0,Math.min(1,(+g('bcNet').value||0)/100));
+  c.legalDiscount=Math.max(0,Math.min(.99,(+g('bcLegal')?.value||24)/100));
   c.eqKg=Math.max(1,+g('bcEq').value||15);
   c.shares=[0,1,2,3].map(i=>Math.max(0,Math.min(1,(+g('bcSN'+i).value||0)/100)));
   c.scale=c.scale||{};c.thresholdKg=c.thresholdKg||{};
