@@ -1,0 +1,30 @@
+{
+  "version": "2026-10",
+  "kgPerBag": 15,
+  "targetPerKg": 72,
+  "costPerPerson": 37000,
+  "grossFactor": 0.72,
+  "legalDiscount": 0.24,
+  "shares": {
+    "N1": 0.55,
+    "N2": 0.50,
+    "N3": 0.40,
+    "N4": 0.30
+  },
+  "thresholdsKg": {
+    "3": [1650, 2265, 2610, 3120],
+    "4": [2200, 3020, 3480, 4160],
+    "5": [2750, 3775, 4350, 5200],
+    "6": [3300, 4530, 5220, 6240],
+    "7": [3850, 5285, 6090, 7280],
+    "8": [4400, 6040, 6960, 8320],
+    "9": [4950, 6795, 7830, 9360]
+  },
+  "notes": {
+    "officialInput": "kg",
+    "bagsAreDisplayOnly": true,
+    "neverDecreasePool": true,
+    "equalSplit": true,
+    "effectiveLiquidFactorFromIndividualPool": 0.5472
+  }
+}
