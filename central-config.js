@@ -4,7 +4,6 @@ const BK='theIceBonusConfigV3',PK='theIceProductsV1',SK='theIceCentralConfigSeen
 function same(a,b){try{return JSON.stringify(a)===JSON.stringify(b)}catch{return false}}
 function clone(o){return JSON.parse(JSON.stringify(o))}
 function migrateOldBonus(c){
-  if(c&&Number(c.target)===72&&Math.abs(Number(c.net)-.72)<.0001){c={...c,target:70,net:.76}}
   return c;
 }
 function readBonusFromForm(){
